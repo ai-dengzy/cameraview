@@ -178,10 +178,11 @@ public class ImageUtil {
 	 */
 	public Bitmap drawTextToLeftBottom(Context context, Bitmap bitmap,
             List<String> list_keywords,boolean b_titileShow_switch,String str_titileShow,
-            Paint paint, float paddingLeft, float paddingBottom,int background_color_depth,int background_color) {
+            Paint paint, float paddingLeft, float paddingBottom,int background_color_depth,int background_color,int CANVAS_WIDTH) {
 		int width = bitmap.getWidth();
 		int height = bitmap.getHeight();
 		Log.d(TAG, "drawTextToLeftBottom: "+width+"----"+height);
+		this.CANVAS_WIDTH = CANVAS_WIDTH;
 		return drawTextToBitmap(context,bitmap, list_keywords,b_titileShow_switch,str_titileShow, paint,paddingLeft,bitmap.getHeight() - paddingBottom,background_color_depth,background_color);
 	}
 

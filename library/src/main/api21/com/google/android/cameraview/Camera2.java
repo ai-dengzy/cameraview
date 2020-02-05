@@ -43,7 +43,7 @@ import java.util.SortedSet;
 @SuppressWarnings("MissingPermission")
 @TargetApi(21)
 class Camera2 extends CameraViewImpl {
-
+    private OnSortedSetNullResultCallback mListener;
     private static final String TAG = "Camera2";
 
     private static final SparseIntArray INTERNAL_FACINGS = new SparseIntArray();
@@ -443,14 +443,24 @@ class Camera2 extends CameraViewImpl {
         }
     }
 
+    public void setOnSortedSetNullResultLister(OnSortedSetNullResultCallback callback){
+        this.mListener = callback;
+    }
+
     private void prepareImageReader() {
         if (mImageReader != null) {
             mImageReader.close();
         }
-        Size largest = mPictureSizes.sizes(mAspectRatio).last();
-        mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
-                ImageFormat.JPEG, /* maxImages */ 2);
-        mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, null);
+        SortedSet<Size> sizes = mPictureSizes.sizes(mAspectRatio);
+        if (sizes!=null){
+//            mListener.onNullRusult();
+            Size largest = sizes.last();
+            mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
+                    ImageFormat.JPEG, /* maxImages */ 2);
+            mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, null);
+        }else {
+            mListener.onNullRusult();
+        }
     }
 
     /**

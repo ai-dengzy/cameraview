@@ -88,7 +88,7 @@ public class JustifyTextView extends TextView {
                                 float lineWidth) {
         float x = 0;
         if (isFirstLineOfParagraph(lineStart, line)) {
-            String blanks = "  ";
+            String blanks = "";
             canvas.drawText(blanks, x, mLineY, getPaint());
             float bw = StaticLayout.getDesiredWidth(blanks, getPaint());
             x += bw;

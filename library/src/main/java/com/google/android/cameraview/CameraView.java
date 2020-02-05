@@ -27,6 +27,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.FrameLayout;
 
 import java.lang.annotation.Retention;
@@ -36,6 +37,10 @@ import java.util.Set;
 
 public class CameraView extends FrameLayout {
 
+    public interface OnSortedSetNullResultLister{
+        void onNullRusult();
+    }
+    OnSortedSetNullResultLister onSortedSetNullResultLister;
     /** The camera device faces the opposite direction as the device's screen. */
     public static final int FACING_BACK = Constants.FACING_BACK;
 
@@ -123,6 +128,18 @@ public class CameraView extends FrameLayout {
                 mImpl.setDisplayOrientation(displayOrientation);
             }
         };
+
+        Camera2 mImpNull = (Camera2) mImpl;
+        mImpNull.setOnSortedSetNullResultLister(new OnSortedSetNullResultCallback() {
+            @Override
+            public void onNullRusult() {
+                onSortedSetNullResultLister.onNullRusult();
+            }
+        });
+    }
+
+    public void setOnSortedSetNullResultLister(OnSortedSetNullResultLister onSortedSetNullResultLister){
+        this.onSortedSetNullResultLister = onSortedSetNullResultLister ;
     }
 
     @NonNull

@@ -18,7 +18,6 @@ package com.google.android.cameraview.demo.ui.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -56,6 +55,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+//import com.apeng.permissions.EsayPermissions;
+//import com.apeng.permissions.OnPermission;
+//import com.apeng.permissions.Permission;
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.Poi;
@@ -86,6 +88,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
+//import myapplication.TestActivity;
+
 
 public class MainActivity extends AppCompatActivity implements
         ActivityCompat.OnRequestPermissionsResultCallback,
@@ -149,11 +154,11 @@ public class MainActivity extends AppCompatActivity implements
     private boolean b_titileShow_switch;
     private boolean b_content;
     private int background_color_depth_flag = 1;
-    private int background_color =0;
-//    private int front_color_flag = -1;
+    private int background_color = 0;
+    //    private int front_color_flag = -1;
     private int front_color = -1;
     private int front_size_flag = 0;
-    private int  front_size = 1;
+    private int front_size = 1;
 
     private String str_weather = "";
     private String str_longitude = "";
@@ -193,8 +198,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private SoundPool sp;//声明一个SoundPool
     private int music;//定义一个整型用load（）；来设置suondID
-
-    float paint_size ;
+    private boolean isSaved = false;
+    float paint_size;
     public boolean isXiMi = false;
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
@@ -202,9 +207,10 @@ public class MainActivity extends AppCompatActivity implements
             switch (v.getId()) {
                 case R.id.take_picture:
                     if (mCameraView != null) {
-                        if (b_voice_switch)
+                        if (b_voice_switch) {
                             sp.play(music, 1, 1, 0, 0, 1);
-                        mToast = Toast.makeText(MainActivity.this,"图片保存中...",Toast.LENGTH_LONG);
+                        }
+                        mToast = Toast.makeText(MainActivity.this, "图片保存中...", Toast.LENGTH_LONG);
                         mToast.show();
                         mCameraView.takePicture();
                     }
@@ -229,6 +235,8 @@ public class MainActivity extends AppCompatActivity implements
     private LinearLayout mLl_takened;
     private TextView mTv_test;
     ImageUtil imageUtil;
+    private Bitmap mToLeftBottom1;
+
     public static boolean isMIUI() {
         String manufacturer = Build.MANUFACTURER;
         //这个字符串可以自己定义,例如判断华为就填写huawei,魅族就填写meizu
@@ -237,6 +245,7 @@ public class MainActivity extends AppCompatActivity implements
         }
         return false;
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -245,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements
         double width = wm.getDefaultDisplay().getWidth();
         double height = wm.getDefaultDisplay().getHeight();
         double raio = height / width;
-        //Toast.makeText(this,Double.toString(raio),Toast.LENGTH_LONG).show();
+//        Toast.makeText(this,Double.toString(raio),Toast.LENGTH_LONG).show();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //透明
             getWindow().setFlags(
@@ -307,55 +316,58 @@ public class MainActivity extends AppCompatActivity implements
             actionBar.setDisplayShowTitleEnabled(false);
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        String time= sdf.format( new Date());
-        str_time = ""+time;
+        String time = sdf.format(new Date());
+        str_time = "" + time;
         project_time.setText(str_time); //更新时间
         mIm_setup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent setUpActivity = new Intent(MainActivity.this, SetUpActivity.class);
-                setUpActivity.putExtra("str_projectname",str_projectname);
-                setUpActivity.putExtra("str_place",str_place);
-                setUpActivity.putExtra("str_weather",str_weather);
-                setUpActivity.putExtra("sh_voice_switch",b_voice_switch);
-                setUpActivity.putExtra("str_titileShow",str_titileShow);
-                setUpActivity.putExtra("str_abtainCompany",str_abtain);
-                setUpActivity.putExtra("str_add",str_add);
-                setUpActivity.putExtra("str_location",str_location);
-                setUpActivity.putExtra("str_content",str_content);
-                setUpActivity.putExtra("str_time",str_time);
-                setUpActivity.putExtra("str_longitude_latitude",str_longitude_latitude);
+                setUpActivity.putExtra("str_projectname", str_projectname);
+                setUpActivity.putExtra("str_place", str_place);
+                setUpActivity.putExtra("str_weather", str_weather);
+                setUpActivity.putExtra("sh_voice_switch", b_voice_switch);
+                setUpActivity.putExtra("str_titileShow", str_titileShow);
+                setUpActivity.putExtra("str_abtainCompany", str_abtain);
+                setUpActivity.putExtra("str_add", str_add);
+                setUpActivity.putExtra("str_location", str_location);
+                setUpActivity.putExtra("str_content", str_content);
+                setUpActivity.putExtra("str_time", str_time);
+                setUpActivity.putExtra("str_longitude_latitude", str_longitude_latitude);
                 startActivityForResult(setUpActivity, 0);
             }
         });
         imageUtil = new ImageUtil();
         sp = new SoundPool(2, AudioManager.STREAM_SYSTEM, 5);//第一个参数为同时播放数据流的最大个数，第二数据流类型，第三为声音质量
         music = sp.load(this, R.raw.takend, 1); //把你的声音素材放到res/raw里，第2个参数即为资源文件，第3个为音乐的优先级
-        list_keyword =  new ArrayList<String>();
+        list_keyword = new ArrayList<String>();
         iv_light = findViewById(R.id.switch_flash);
         iv_light.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 {
                     if (mCameraView != null) {
-                        switch (LIGHT_FLAG){
+                        switch (LIGHT_FLAG) {
                             case 0://当闪关灯自动状态
                                 //设置为关闭
                                 LIGHT_FLAG = 1;
                                 mCameraView.setFlash(FLASH_OPTIONS[LIGHT_FLAG]);
-                                iv_light.setBackground(MainActivity.this.getResources().getDrawable(R.drawable.icon_light_close));
+                                iv_light.setBackground(MainActivity.this.getResources().getDrawable(
+                                        R.drawable.icon_light_close));
                                 break;
                             case 1://当闪光灯关闭状态
                                 //设置为打开
                                 LIGHT_FLAG = 2;
                                 mCameraView.setFlash(FLASH_OPTIONS[LIGHT_FLAG]);
-                                iv_light.setBackground(MainActivity.this.getResources().getDrawable(R.drawable.icon_light_open));
+                                iv_light.setBackground(MainActivity.this.getResources().getDrawable(
+                                        R.drawable.icon_light_open));
                                 break;
                             case 2://当闪光灯打开状态
                                 //设置为打开
                                 LIGHT_FLAG = 0;
                                 mCameraView.setFlash(FLASH_OPTIONS[LIGHT_FLAG]);
-                                iv_light.setBackground(MainActivity.this.getResources().getDrawable(R.drawable.icon_light));
+                                iv_light.setBackground(MainActivity.this.getResources().getDrawable(
+                                        R.drawable.icon_light));
                                 break;
                         }
                     }
@@ -378,7 +390,8 @@ public class MainActivity extends AppCompatActivity implements
             public void onClick(View view) {
                 //调用有返回值的相册
                 /*Intent i = new Intent(Intent.ACTION_PICK,null);
-                i.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,"image/*");
+                i.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                "image/*");
                 startActivity(i);*//*
                 Intent intent = new Intent(Intent.ACTION_PICK);
                 context.startActivity(intent);*/
@@ -387,89 +400,131 @@ public class MainActivity extends AppCompatActivity implements
 //      intent.setType("image/*");
 //      startActivityForResult(intent, 500);
                 //直接调用打开相册
+
+//                Intent intent = new Intent(Intent.ACTION_VIEW);
+//                intent.setType("image/*");
+//                startActivity(intent);
+
                 Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setType("image/*");
+                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
                 startActivity(intent);
             }
         });
 
         mSharedPreferences = getSharedPreferences("camera", MODE_PRIVATE);
-        b_voice_switch = mSharedPreferences.getBoolean("sh_voice_switch",true);
-        b_watermark_switch = mSharedPreferences.getBoolean("sh_watermark_switch",true);
-        b_abtain_switch = mSharedPreferences.getBoolean("sh_abtain_switch",true);
-        b_place_switch = mSharedPreferences.getBoolean("sh_watermark_projectadd",true);
-        b_titileShow_switch = mSharedPreferences.getBoolean("sh_titileShow_switch",true);
-        b_projectname_switch = mSharedPreferences.getBoolean("sh_watermark_projectname",true);
-        b_add_switch = mSharedPreferences.getBoolean("sh_watermark_add",true);
-        b_content = mSharedPreferences.getBoolean("sh_content",true);
-        b_time_switch = mSharedPreferences.getBoolean("sh_watermark_projecttime",true);
-        b_longitude_switch = mSharedPreferences.getBoolean("sh_watermark_longitude",true);
-        b_weather_switch = mSharedPreferences.getBoolean("sh_watermark_weather",true);
-        background_color_depth_flag = mSharedPreferences.getInt("background_color_depth_flag",1);
-        background_color = mSharedPreferences.getInt("background_color",-1);
+        b_voice_switch = mSharedPreferences.getBoolean("sh_voice_switch", true);
+        b_watermark_switch = mSharedPreferences.getBoolean("sh_watermark_switch", true);
+        b_abtain_switch = mSharedPreferences.getBoolean("sh_abtain_switch", true);
+        b_place_switch = mSharedPreferences.getBoolean("sh_watermark_projectadd", true);
+        b_titileShow_switch = mSharedPreferences.getBoolean("sh_titileShow_switch", true);
+        b_projectname_switch = mSharedPreferences.getBoolean("sh_watermark_projectname", true);
+        b_add_switch = mSharedPreferences.getBoolean("sh_watermark_add", true);
+        b_content = mSharedPreferences.getBoolean("sh_content", true);
+        b_time_switch = mSharedPreferences.getBoolean("sh_watermark_projecttime", true);
+        b_longitude_switch = mSharedPreferences.getBoolean("sh_watermark_longitude", true);
+        b_weather_switch = mSharedPreferences.getBoolean("sh_watermark_weather", true);
+        background_color_depth_flag = mSharedPreferences.getInt("background_color_depth_flag", 1);
+        background_color = mSharedPreferences.getInt("background_color", -1);
         //front_color_flag = mSharedPreferences.getInt("front_color_flag",-1);
-        front_color = mSharedPreferences.getInt("front_color",-1);
-        front_size_flag = mSharedPreferences.getInt("front_size_flag",-1);
-        str_abtain = mSharedPreferences.getString("et_abtainCompany","str_取证单位");
-        str_projectname = mSharedPreferences.getString("et_projectName","str_项目名称");
+        front_color = mSharedPreferences.getInt("front_color", -1);
+        front_size_flag = mSharedPreferences.getInt("front_size_flag", -1);
+        str_abtain = mSharedPreferences.getString("et_abtainCompany", "str_取证单位");
+        str_projectname = mSharedPreferences.getString("et_projectName", "str_项目名称");
         //str_location = mSharedPreferences.getString("et_location","str_位置信息");
-        str_content = mSharedPreferences.getString("et_content","str_作业内容");
-        str_titileShow = mSharedPreferences.getString("et_titileShow","str_作业内容");
-        str_place = mSharedPreferences.getString("et_projectAdd","str_施工单位");
+        str_content = mSharedPreferences.getString("et_content", "str_作业内容");
+        str_titileShow = mSharedPreferences.getString("et_titileShow", "str_作业内容");
+        str_place = mSharedPreferences.getString("et_projectAdd", "str_施工单位");
         //str_time = mSharedPreferences.getString("et_time","");
         //str_longitude_latitude = mSharedPreferences.getString("et_longitude_latitude","");
         iniData();
         //友盟推送
         PushAgent.getInstance(this).onAppStart();
         mLl_takened = findViewById(R.id.ll_takened);
-        if (raio>2.0){
+        if (raio > 2.0) {
             // 移动相机
-            RelativeLayout.LayoutParams  layoutParams =
+            RelativeLayout.LayoutParams layoutParams =
                     (RelativeLayout.LayoutParams) mCameraView.getLayoutParams();
-            layoutParams.bottomMargin = (int) (getResources().getDimension(R.dimen.px_220))/2;//将默认的距离底部20dp，改为0，这样底部区域全被listview填满。
+            layoutParams.bottomMargin = (int) (getResources().getDimension(R.dimen.px_160))
+                    / 2;
             mCameraView.setLayoutParams(layoutParams);
-            // 移动拍照布局
-            RelativeLayout.LayoutParams  layoutParams1 =
+            // 移动底部拍照布局
+            RelativeLayout.LayoutParams layoutParams1 =
                     (RelativeLayout.LayoutParams) mLl_takened.getLayoutParams();
-            layoutParams1.bottomMargin = (int) ((getResources().getDimension(R.dimen.px_220))/2);//将默认的距离底部20dp，改为0，这样底部区域全被listview填满。
+            layoutParams1.bottomMargin = (int) ((getResources().getDimension(R.dimen.px_200))
+                    / 2);
             mLl_takened.setLayoutParams(layoutParams1);
-        }else if (raio>1.9){
+        } else if (raio > 1.9) {
             // 移动相机
-            RelativeLayout.LayoutParams  layoutParams =
+            RelativeLayout.LayoutParams layoutParams =
                     (RelativeLayout.LayoutParams) mCameraView.getLayoutParams();
-            layoutParams.bottomMargin = (int) (getResources().getDimension(R.dimen.px_150))/2;//将默认的距离底部20dp，改为0，这样底部区域全被listview填满。
+            layoutParams.bottomMargin = (int) (getResources().getDimension(R.dimen.px_150))
+                    / 2;
             mCameraView.setLayoutParams(layoutParams);
-            // 移动拍照布局
-            RelativeLayout.LayoutParams  layoutParams1 =
+            // 移动底部拍照布局
+            RelativeLayout.LayoutParams layoutParams1 =
                     (RelativeLayout.LayoutParams) mLl_takened.getLayoutParams();
-            layoutParams1.bottomMargin = (int) (getResources().getDimension(R.dimen.px_150))/2;//将默认的距离底部20dp，改为0，这样底部区域全被listview填满。
+            layoutParams1.bottomMargin = (int) (getResources().getDimension(R.dimen.px_150))
+                    / 2;
             mLl_takened.setLayoutParams(layoutParams1);
-        }else if (raio>1.8){
+        } else if (raio > 1.8) {
             // 移动相机
-            RelativeLayout.LayoutParams  layoutParams =
+            RelativeLayout.LayoutParams layoutParams =
                     (RelativeLayout.LayoutParams) mCameraView.getLayoutParams();
-            layoutParams.bottomMargin = (int) (getResources().getDimension(R.dimen.px_100))/2;//将默认的距离底部20dp，改为0，这样底部区域全被listview填满。
+            layoutParams.bottomMargin = (int) (getResources().getDimension(R.dimen.px_100))
+                    / 2;
             mCameraView.setLayoutParams(layoutParams);
-            // 移动拍照布局
-            RelativeLayout.LayoutParams  layoutParams1 =
+            // 移动底部拍照布局
+            RelativeLayout.LayoutParams layoutParams1 =
                     (RelativeLayout.LayoutParams) mLl_takened.getLayoutParams();
-            layoutParams1.bottomMargin = (int) (getResources().getDimension(R.dimen.px_100))/2;//将默认的距离底部20dp，改为0，这样底部区域全被listview填满。
+            layoutParams1.bottomMargin = (int) (getResources().getDimension(R.dimen.px_100))
+                    / 2;
             mLl_takened.setLayoutParams(layoutParams1);
         }
 
-        if (isMIUI()){
+        if (isMIUI()) {
             isXiMi = true;
             Log.d(TAG, "onCreate: 是小米");
-        }else{
+        } else {
             isXiMi = false;
             Log.d(TAG, "onCreate: 不是 小米");
         }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        //不添加华为手机百度地图获取不到数据
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             //请求权限
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_CODE);
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_CODE);
         }
+
+        //检查相机权限
+       /* if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED) {
+
+        } else {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.CAMERA},
+                    1);
+        }*/
+       //小米部分手机调用相机函数为空的回调。为空启动第二套方案Activity
+        mCameraView.setOnSortedSetNullResultLister(new CameraView.OnSortedSetNullResultLister() {
+            @Override
+            public void onNullRusult() {
+                //申请权限,开启第二套方案
+//                requestPermission();
+                mCameraView.stop();
+                Log.d(TAG, "111111111111111111: ");
+                mCameraView = null;//不设置为null，MMActiviry.class中的camerakit相机打不开
+                Intent intent = new Intent(MainActivity.this, MMActiviry.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
     }
 
     @Override
@@ -477,28 +532,26 @@ public class MainActivity extends AppCompatActivity implements
         super.onResume();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
-            mCameraView.start();
+                mCameraView.start();
         } else if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.CAMERA)) {
-            ConfirmationDialogFragment
+            /*ConfirmationDialogFragment
                     .newInstance(R.string.camera_permission_confirmation,
                             new String[]{Manifest.permission.CAMERA},
                             REQUEST_CAMERA_PERMISSION,
                             R.string.camera_permission_not_granted)
-                    .show(getSupportFragmentManager(), FRAGMENT_DIALOG);
+                    .show(getSupportFragmentManager(), FRAGMENT_DIALOG);*/
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
                     REQUEST_CAMERA_PERMISSION);
         }
-        MobclickAgent.onResume(this);
-
     }
 
+    private boolean b = true;
     @Override
     protected void onPause() {
-        mCameraView.stop();
         super.onPause();
-        MobclickAgent.onPause(this);
+        mCameraView.stop();
     }
 
     @Override
@@ -512,8 +565,7 @@ public class MainActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             case R.id.aspect_ratio:
                 FragmentManager fragmentManager = getSupportFragmentManager();
-                if (mCameraView != null
-                        && fragmentManager.findFragmentByTag(FRAGMENT_DIALOG) == null) {
+                if (mCameraView != null&& fragmentManager.findFragmentByTag(FRAGMENT_DIALOG) == null) {
                     final Set<AspectRatio> ratios = mCameraView.getSupportedAspectRatios();
                     AspectRatio currentRatio = mCameraView.getAspectRatio();
                    /* if (is_16_9){
@@ -560,6 +612,7 @@ public class MainActivity extends AppCompatActivity implements
             }*/
         }
     }
+
     float canvasTextSize1 = 42;
     float canvasTextSize2 = 44;
     float canvasTextSize3 = 46;
@@ -587,70 +640,90 @@ public class MainActivity extends AppCompatActivity implements
             Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
             float bitmapWidth = bitmap.getWidth();
             float bitmapHeight = bitmap.getHeight();
-            float ratio = getPxRatio(bitmapWidth,bitmapHeight);
+            float ratio = getPxRatio(bitmapWidth, bitmapHeight);
             Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
             paint.setColor(front_color);
-            switch (front_size){
+            switch (front_size) {
                 case 0:
-                    paint_size = canvasTextSize1*ratio;
+                    paint_size = canvasTextSize1 * ratio;
                     break;
                 case 1:
-                    paint_size = canvasTextSize2*ratio;
+                    paint_size = canvasTextSize2 * ratio;
                     break;
                 case 2:
-                    paint_size = canvasTextSize3*ratio;
+                    paint_size = canvasTextSize3 * ratio;
                     break;
                 case 3:
-                    paint_size = canvasTextSize4*ratio;
+                    paint_size = canvasTextSize4 * ratio;
                     break;
             }
             paint.setTextSize(paint_size);
             list_keyword.clear();
-            if (b_place_switch)
-                list_keyword.add("施工单位："+str_place);
-            if (b_abtain_switch)
-                list_keyword.add("取证单位："+str_abtain);
-            if (b_projectname_switch)
-                list_keyword.add("项目名称："+str_projectname);
-            if (b_add_switch)
-                list_keyword.add("^_^"+str_location);
-            if (b_content){
-                list_keyword.add("作业内容："+str_content);
+            if (b_place_switch) {
+                list_keyword.add("施工单位：" + str_place);
             }
-            if (b_time_switch)
-                list_keyword.add("当前日期："+str_time);
-            if (b_longitude_switch){
-                list_keyword.add("经纬度数："+str_longitude_latitude);
+            if (b_abtain_switch) {
+                list_keyword.add("取证单位：" + str_abtain);
             }
-            if (b_weather_switch)
-                list_keyword.add("天气状况："+str_weather);
-            if (!b_watermark_switch)
+            if (b_projectname_switch) {
+                list_keyword.add("项目名称：" + str_projectname);
+            }
+            if (b_add_switch) {
+                list_keyword.add("^_^" + str_location);
+            }
+            if (b_content) {
+                list_keyword.add("作业内容：" + str_content);
+            }
+            if (b_time_switch) {
+                list_keyword.add("当前日期：" + str_time);
+            }
+            if (b_longitude_switch) {
+                list_keyword.add("经纬度数：" + str_longitude_latitude);
+            }
+            if (b_weather_switch) {
+                list_keyword.add("天气状况：" + str_weather);
+            }
+            if (!b_watermark_switch) {
                 list_keyword.clear();
-            if (isXiMi){
-                bitmap = imageUtil.createDegree(bitmap,90);
+            }
+            if (bitmapWidth>bitmapHeight) {
+                bitmap = imageUtil.createDegree(bitmap, 90);
             }
             float paddingBottom = 100 * getPxRatio(bitmap.getWidth(), bitmap.getHeight());
-            Bitmap toLeftBottom1 = imageUtil.drawTextToLeftBottom(MainActivity.this, bitmap,
-                    list_keyword,b_titileShow_switch,str_titileShow,
-                    paint,40*getPxRatio(bitmap.getWidth(),bitmap.getHeight()),paddingBottom,background_color_depth_flag,background_color);
+            mToLeftBottom1 = imageUtil.drawTextToLeftBottom(MainActivity.this, bitmap,
+                    list_keyword, b_titileShow_switch, str_titileShow,
+                    paint, 40 * getPxRatio(bitmap.getWidth(), bitmap.getHeight()), paddingBottom,
+                    background_color_depth_flag, background_color,3);
             imageView.setImageBitmap(bitmap);
-            saveImageToGallery_test(toLeftBottom1);
-            if(bitmap != null && !bitmap.isRecycled()){
-                // 回收并且置为null
-                bitmap.recycle();
-                bitmap = null;
+            saveImageToGallery_test(mToLeftBottom1);
+            String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            //验证是否许可权限
+            for (String str : permissions) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (checkSelfPermission(str) != PackageManager.PERMISSION_GRANTED) {
+                        //申请权限
+//                        Toast.makeText(MainActivity.this,"没有保存照片权限",Toast.LENGTH_LONG).show();
+                    }else {
+//                        Toast.makeText(MainActivity.this,"已获得保存照片权限",Toast.LENGTH_LONG).show();
+                        if (bitmap != null && !bitmap.isRecycled()) {
+                            // 回收并且置为null
+                            bitmap.recycle();
+                            bitmap = null;
+                        }
+                        if (mToLeftBottom1 != null && !mToLeftBottom1.isRecycled()) {
+                            // 回收并且置为null
+                            mToLeftBottom1.recycle();
+                            mToLeftBottom1 = null;
+                        }
+                        System.gc();
+                    }
+                }
             }
-            if(toLeftBottom1 != null && !toLeftBottom1.isRecycled()){
-                // 回收并且置为null
-                toLeftBottom1.recycle();
-                toLeftBottom1 = null;
-            }
-            System.gc();
+
         }
     };
 
-    public static class ConfirmationDialogFragment extends DialogFragment {
-
+   /* public static class ConfirmationDialogFragment extends DialogFragment {
         private static final String ARG_MESSAGE = "message";
         private static final String ARG_PERMISSIONS = "permissions";
         private static final String ARG_REQUEST_CODE = "request_code";
@@ -697,7 +770,7 @@ public class MainActivity extends AppCompatActivity implements
                             })
                     .create();
         }
-    }
+    }*/
 
     /**
      * 为了得到传回的数据，必须在前面的Activity中（指MainActivity类）重写onActivityResult方法
@@ -714,13 +787,13 @@ public class MainActivity extends AppCompatActivity implements
             str_time = "" + data.getExtras().getString("time");
             str_abtain = "" + data.getExtras().getString("et_abtainCompany");
             front_size = data.getExtras().getInt("front_size");
-            b_watermark_switch = data.getExtras().getBoolean("b_watermark_switch");  
-            b_weather_switch = data.getExtras().getBoolean("b_weather_switch");  
-            b_longitude_switch = data.getExtras().getBoolean("b_longitude_switch");  
-            b_add_switch = data.getExtras().getBoolean("b_add_switch");  
-            b_projectname_switch = data.getExtras().getBoolean("b_projectname_switch");  
-            b_place_switch = data.getExtras().getBoolean("b_place_switch");  
-            b_time_switch = data.getExtras().getBoolean("b_time_switch");  
+            b_watermark_switch = data.getExtras().getBoolean("b_watermark_switch");
+            b_weather_switch = data.getExtras().getBoolean("b_weather_switch");
+            b_longitude_switch = data.getExtras().getBoolean("b_longitude_switch");
+            b_add_switch = data.getExtras().getBoolean("b_add_switch");
+            b_projectname_switch = data.getExtras().getBoolean("b_projectname_switch");
+            b_place_switch = data.getExtras().getBoolean("b_place_switch");
+            b_time_switch = data.getExtras().getBoolean("b_time_switch");
             b_custom_switch = data.getExtras().getBoolean("b_custom_switch");
             background_color_depth_flag = data.getExtras().getInt("background_color_depth");
             b_voice_switch = data.getExtras().getBoolean("sh_voice_switch");
@@ -731,7 +804,7 @@ public class MainActivity extends AppCompatActivity implements
             str_weather = data.getExtras().getString("et_weather");
             str_location = data.getExtras().getString("et_location");
             b_content = data.getExtras().getBoolean("b_content");
-
+            isSaved = data.getExtras().getBoolean("isSaved");
             if (!str_projectname.isEmpty()) {
                 tv_projectName.setText(str_projectname);
             }
@@ -772,71 +845,70 @@ public class MainActivity extends AppCompatActivity implements
         //设置字体大小
         setFrontSize();
         //水印开关
-        if (b_watermark_switch){
+        if (b_watermark_switch) {
             ll_titile_background.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             ll_titile_background.setVisibility(View.INVISIBLE);
         }
         //标题是否显示
-        if (b_titileShow_switch){
+        if (b_titileShow_switch) {
             tv_titile.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             tv_titile.setVisibility(View.GONE);
         }
         //施工单位开关
-        if (b_place_switch){
+        if (b_place_switch) {
             ll_place.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             ll_place.setVisibility(View.GONE);
         }
         //取证单位
-        if (b_abtain_switch){
+        if (b_abtain_switch) {
             ll_abtain.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             ll_abtain.setVisibility(View.GONE);
         }
         //项目名称开关
-        if (b_projectname_switch){
+        if (b_projectname_switch) {
             ll_project_name.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             ll_project_name.setVisibility(View.GONE);
         }
         //位置信息开关
-        if (b_add_switch){
+        if (b_add_switch) {
             ll_add.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             ll_add.setVisibility(View.GONE);
         }
         //作业内容开关
-        if(b_content){
+        if (b_content) {
             ll_content.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             ll_content.setVisibility(View.GONE);
         }
         //当前日期开关
-        if (b_time_switch){
+        if (b_time_switch) {
             ll_time.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             ll_time.setVisibility(View.GONE);
         }
         //经纬度数开关
-        if (b_longitude_switch){
+        if (b_longitude_switch) {
             ll_logitude.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             ll_logitude.setVisibility(View.GONE);
         }
         //天气状况开关
-        if (b_weather_switch){
+        if (b_weather_switch) {
             ll_weather.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             ll_weather.setVisibility(View.GONE);
         }
-        if (b_custom_switch){
+        if (b_custom_switch) {
             tv_custom.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             tv_custom.setVisibility(View.GONE);
         }
-
     }
 
     private void setFrontSize() {
@@ -1007,24 +1079,29 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-       // getLocation();
+        // getLocation();
         // -----------location config ------------
         locationService = ((DemoApplication) getApplication()).locationService;
-        //获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity，都是通过此种方式获取locationservice实例的
+        //获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity
+        // ，都是通过此种方式获取locationservice实例的
         locationService.registerListener(mListener);
         //注册监听
 //        int type = getIntent().getIntExtra("from", 0);
 //        if (type == 0) {
 //            locationService.setLocationOption(locationService.getDefaultLocationClientOption());
 //        } else if (type == 1) {
-            locationService.start();
+        locationService.start();
 //        }
-
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
         switch (requestCode) {
+            case 101:
+                if (mToLeftBottom1!=null)
+                    saveImageToGallery_test(mToLeftBottom1);
+                break;
         }
     }
 
@@ -1058,11 +1135,11 @@ public class MainActivity extends AppCompatActivity implements
                 sb.append("\nlocType description : ");// *****对应的定位类型说明*****
                 sb.append(location.getLocTypeDescription());
                 sb.append("\nlatitude : ");// 纬度
-                str_latitude = location.getLatitude()+"";
+                str_latitude = location.getLatitude() + "";
                 sb.append(location.getLatitude());
                 sb.append("\nlongtitude : ");// 经度
-                str_longitude = location.getLongitude()+"";
-                str_longitude_latitude = str_longitude+"/"+str_latitude;
+                str_longitude = location.getLongitude() + "";
+                str_longitude_latitude = str_longitude + "/" + str_latitude;
                 project_logitude_latitude.setText(str_longitude_latitude);
                 sb.append(location.getLongitude());
                 sb.append("\nradius : ");// 半径
@@ -1087,7 +1164,9 @@ public class MainActivity extends AppCompatActivity implements
                 sb.append(location.getStreet());
                 sb.append("\naddr : ");// 地址信息
                 str_location = location.getAddrStr();
-                tv_projectAdd.setText(location.getAddrStr());
+                if (!isSaved) {
+                    tv_projectAdd.setText(location.getAddrStr());
+                }
                 sb.append(location.getAddrStr());
                 sb.append("\nStreetNumber : ");// 获取街道号码
                 sb.append(location.getStreetNumber());
@@ -1108,7 +1187,9 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 }
                 if (location.getPoiRegion() != null) {
-                    sb.append("PoiRegion: ");// 返回定位位置相对poi的位置关系，仅在开发者设置需要POI信息时才会返回，在网络不通或无法获取时有可能返回null
+                    sb.append(
+                            "PoiRegion: ");// 返回定位位置相对poi的位置关系，仅在开发者设置需要POI
+                    // 信息时才会返回，在网络不通或无法获取时有可能返回null
                     PoiRegion poiRegion = location.getPoiRegion();
                     sb.append("DerectionDesc:"); // 获取POIREGION的位置关系，ex:"内"
                     sb.append(poiRegion.getDerectionDesc() + "; ");
@@ -1164,8 +1245,10 @@ public class MainActivity extends AppCompatActivity implements
                 } else if (location.getLocType() == BDLocation.TypeCriteriaException) {
                     sb.append("\ndescribe : ");
                     sb.append("无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机");
-                    //project_weather.setText("无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机");
-                    //tv_projectAdd.setText("无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机");
+                    //project_weather.setText
+                    // ("无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机");
+                    //tv_projectAdd.setText
+                    // ("无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机");
                     //str_weather = "无法获取有效定位依据导致定位失败";
                     //str_location = "无法获取有效定位依据导致定位失败";
                 }
@@ -1174,11 +1257,13 @@ public class MainActivity extends AppCompatActivity implements
                 //mTv_test.setMovementMethod(ScrollingMovementMethod.getInstance());
             }
         }
+
         @Override
         public void onConnectHotSpotMessage(String s, int i) {
             super.onConnectHotSpotMessage(s, i);
         }
     };
+
     @Override
     protected void onStop() {
         locationService.unregisterListener(mListener); //注销掉监听
@@ -1198,7 +1283,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    private void getNetWeather(String city){
+    private void getNetWeather(String city) {
         UrlHttpUtil.get(HTTP_PRE + city, new CallBackUtil.CallBackString() {
             @Override
             public void onFailure(int code, String errorMessage) {
@@ -1207,17 +1292,17 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void onResponse(String response) {
-                JSONObject  dataJson = null;
+                JSONObject dataJson = null;
                 try {
                     dataJson = new JSONObject(response);
-                    JSONObject  response1 = dataJson.getJSONObject("data");
+                    JSONObject response1 = dataJson.getJSONObject("data");
                     JSONArray data = response1.getJSONArray("forecast");
-                    JSONObject info=data.getJSONObject(0);
-                    String high=info.getString("high").substring(2);
-                    String low=info.getString("low").substring(2);
-                    String type=info.getString("type");
-                    String fengxiang=info.getString("fengxiang");
-                    str_weather = ""+type+","+fengxiang+","+low+" ~"+high;
+                    JSONObject info = data.getJSONObject(0);
+                    String high = info.getString("high").substring(2);
+                    String low = info.getString("low").substring(2);
+                    String type = info.getString("type");
+                    String fengxiang = info.getString("fengxiang");
+                    str_weather = "" + type + "," + fengxiang + "," + low + " ~" + high;
                     project_weather.setText(str_weather);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -1247,7 +1332,7 @@ public class MainActivity extends AppCompatActivity implements
             fos = new FileOutputStream(file);
             final FileOutputStream finalFos = fos;
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, finalFos);
-            Toast.makeText(this,"已保存", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "已保存", Toast.LENGTH_SHORT).show();
             fos.flush();
             //通知系统相册刷新
             sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
@@ -1267,6 +1352,7 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
     }
+
     private void saveImage(Bitmap bmp) {
         if (Build.VERSION.SDK_INT >= 23) {
             int REQUEST_CODE_CONTACT = 101;
@@ -1295,7 +1381,8 @@ public class MainActivity extends AppCompatActivity implements
             saveImageToGallery(bmp);
         }
         // 发送广播，通知刷新图库的显示
-        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + fileName)));
+        sendBroadcast(
+                new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + fileName)));
         //通知系统相册刷新
         sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
                 Uri.fromFile(new File(file.getPath()))));
@@ -1304,53 +1391,55 @@ public class MainActivity extends AppCompatActivity implements
     public void saveImageToGallery(Bitmap bmp) {
         String[] PERMISSIONS = {
                 "android.permission.READ_EXTERNAL_STORAGE",
-                "android.permission.WRITE_EXTERNAL_STORAGE" };
+                "android.permission.WRITE_EXTERNAL_STORAGE"};
         //检测是否有写的权限
         int permission = ContextCompat.checkSelfPermission(this,
                 "android.permission.WRITE_EXTERNAL_STORAGE");
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // 没有写的权限，去申请写的权限，会弹出对话框
-            ActivityCompat.requestPermissions(this, PERMISSIONS,1);
+            ActivityCompat.requestPermissions(this, PERMISSIONS, 1);
         }
         DateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
         /*
          * 保存文件，文件名为当前日期
          */
-        String fileName ;
-        File file ;
-        if(Build.BRAND .equals("Xiaomi") ){ // 小米手机  ----> 电企通相机改为了“DCIM”
-            fileName = Environment.getExternalStorageDirectory().getPath()+"/DCIM/Camera/"+format.format(new Date())+".JPEG" ;
-        }else{ // Meizu 、Oppo
-            fileName = Environment.getExternalStorageDirectory().getPath()+"/DCIM/"+format.format(new Date())+".JPEG" ;
+        String fileName;
+        File file;
+        if (Build.BRAND.equals("Xiaomi")) { // 小米手机  ----> 电企通相机改为了“DCIM”
+            fileName = Environment.getExternalStorageDirectory().getPath() + "/DCIM/Camera/"
+                    + format.format(new Date()) + ".JPEG";
+        } else { // Meizu 、Oppo
+            fileName =
+                    Environment.getExternalStorageDirectory().getPath() + "/DCIM/" + format.format(
+                            new Date()) + ".JPEG";
         }
         file = new File(fileName);
-        if(file.exists()){
+        if (file.exists()) {
             file.delete();
         }
         FileOutputStream out;
-        try{
+        try {
             out = new FileOutputStream(file);
             // 格式为 JPEG，照相机拍出的图片为JPEG格式的，PNG格式的不能显示在相册中
-            if(bmp.compress(Bitmap.CompressFormat.JPEG, 90, out))
-            {
+            if (bmp.compress(Bitmap.CompressFormat.JPEG, 90, out)) {
                 out.flush();
                 out.close();
                 // 插入图库
-                MediaStore.Images.Media.insertImage(getContentResolver(), file.getAbsolutePath(), format.format(new Date())+".JPEG", null);
+                MediaStore.Images.Media.insertImage(getContentResolver(), file.getAbsolutePath(),
+                        format.format(new Date()) + ".JPEG", null);
             }
-        }
-        catch (FileNotFoundException e)
-        {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         // 发送广播，通知刷新图库的显示
-        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + fileName)));
+        sendBroadcast(
+                new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + fileName)));
         //通知系统相册刷新
         sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
                 Uri.fromFile(new File(file.getPath()))));
     }
+
+
 }

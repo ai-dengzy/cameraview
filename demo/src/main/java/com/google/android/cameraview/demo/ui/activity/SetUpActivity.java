@@ -521,6 +521,7 @@ public class SetUpActivity extends AppCompatActivity {
                 intent.putExtra("et_content",et_content.getText().toString().trim());
                 intent.putExtra("et_longitude_latitude",et_longitude_latitude.getText().toString().trim());
                 intent.putExtra("et_weather",et_weather.getText().toString().trim());
+                intent.putExtra("isSaved",true);
                 //设置返回数据
                 SetUpActivity.this.setResult(RESULT_OK, intent);
                 mSpEdit.putBoolean("sh_content",b_content);

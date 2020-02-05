@@ -34,4 +34,15 @@
         android:title="@string/switch_camera"
         app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/main_menu_gallery"
+        android:icon="@drawable/ic_gallery"
+        android:title="Gallery"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/main_menu_about"
+        android:icon="@drawable/ic_info"
+        android:title="About"
+        app:showAsAction="always" />
+
 </menu>

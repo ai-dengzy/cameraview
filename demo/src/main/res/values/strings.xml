@@ -11,6 +11,13 @@
     limitations under the License.
 -->
 <resources>
+
+    <string name="url_github">https://github.com/wonderkiln/camerakit-android</string>
+    <string name="url_website">http://camerakit.website</string>
+
+    <string name="about_dialog_title">About</string>
+    <string name="about_dialog_message">CameraKit is open source software distributed under the MIT license.\n\nFor more details visit www.camerakit.website/.</string>
+
     <string name="app_name">电企通相机</string>
     <string name="camera_permission_confirmation">This app demonstrates the usage of CameraView. In order to do that, it needs permission to access camera.</string>
     <string name="camera_permission_not_granted">Camera app cannot do anything without camera permission.</string>

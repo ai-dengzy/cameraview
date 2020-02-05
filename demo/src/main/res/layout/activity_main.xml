@@ -33,56 +33,7 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"/>-->
 
-    <RelativeLayout
-        android:id="@+id/rl_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/camera"
-        android:layout_marginBottom="@dimen/px_0"
-        android:background="@android:color/black">
-        <ImageView
-            android:id="@+id/iv_logoooo"
-            android:layout_marginLeft="@dimen/px_10"
-            android:layout_centerVertical="true"
-            android:background="@drawable/icon_logo"
-            android:layout_width="@dimen/px_60"
-            android:layout_height="@dimen/px_40">
-        </ImageView>
 
-        <TextView
-            android:id="@+id/my_name"
-            android:text="@string/title"
-            android:layout_marginLeft="@dimen/px_8"
-            android:layout_toRightOf="@id/iv_logoooo"
-            android:textSize="@dimen/px_text_40"
-            android:layout_centerVertical="true"
-            android:textColor="#ffffff"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-        </TextView>
-        <ImageView
-            android:id="@+id/iv_setup"
-            android:layout_width="@dimen/px_40"
-            android:layout_height="@dimen/px_40"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginStart="@dimen/px_5"
-            android:layout_marginLeft="@dimen/px_5"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="@dimen/px_30"
-            android:layout_marginRight="@dimen/px_30"
-            android:background="@drawable/icon_setting" />
-
-        <ImageView
-            android:id="@+id/switch_flash"
-            android:layout_width="@dimen/px_40"
-            android:layout_height="@dimen/px_40"
-            android:layout_marginRight="@dimen/px_6"
-            android:layout_toLeftOf="@id/iv_setup"
-            android:layout_centerVertical="true"
-            android:background="@drawable/icon_light" />
-
-    </RelativeLayout>
 
     <com.google.android.cameraview.CameraView
         android:id="@+id/camera"
@@ -95,6 +46,8 @@
         app:aspectRatio="4:3"
         android:layout_above="@id/ll_takened"
         android:background="@android:color/black"/>
+
+
     <include layout="@layout/layout_main_titile" />
 
     <LinearLayout
@@ -112,9 +65,8 @@
         <ImageView
             android:layout_gravity="center_vertical"
             android:id="@+id/iv_photos"
-            android:visibility="invisible"
             android:layout_marginRight="@dimen/px_40"
-            android:background="@color/primaryText"
+            android:background="@drawable/ic_gallery"
             android:layout_height="@dimen/px_65"
             android:layout_width="@dimen/px_70"
             android:layout_marginEnd="@dimen/px_40" />
@@ -177,5 +129,54 @@
         android:layout_marginBottom="@dimen/px_300"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"/>
+    <RelativeLayout
+        android:id="@+id/rl_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/camera"
+        android:layout_marginBottom="@dimen/px_0"
+        android:background="@android:color/black">
+        <ImageView
+            android:id="@+id/iv_logoooo"
+            android:layout_marginLeft="@dimen/px_10"
+            android:layout_centerVertical="true"
+            android:background="@drawable/icon_logo"
+            android:layout_width="@dimen/px_60"
+            android:layout_height="@dimen/px_40">
+        </ImageView>
 
+        <TextView
+            android:id="@+id/my_name"
+            android:text="@string/title"
+            android:layout_marginLeft="@dimen/px_8"
+            android:layout_toRightOf="@id/iv_logoooo"
+            android:textSize="@dimen/px_text_40"
+            android:layout_centerVertical="true"
+            android:textColor="#ffffff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </TextView>
+        <ImageView
+            android:id="@+id/iv_setup"
+            android:layout_width="@dimen/px_40"
+            android:layout_height="@dimen/px_40"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginStart="@dimen/px_5"
+            android:layout_marginLeft="@dimen/px_5"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/px_30"
+            android:layout_marginRight="@dimen/px_30"
+            android:background="@drawable/icon_setting" />
+
+        <ImageView
+            android:id="@+id/switch_flash"
+            android:layout_width="@dimen/px_40"
+            android:layout_height="@dimen/px_40"
+            android:layout_marginRight="@dimen/px_6"
+            android:layout_toLeftOf="@id/iv_setup"
+            android:layout_centerVertical="true"
+            android:background="@drawable/icon_light" />
+
+    </RelativeLayout>
 </RelativeLayout>
