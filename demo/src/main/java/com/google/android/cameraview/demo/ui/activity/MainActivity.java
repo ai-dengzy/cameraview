@@ -18,8 +18,6 @@ package com.google.android.cameraview.demo.ui.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -36,13 +34,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -55,9 +50,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-//import com.apeng.permissions.EsayPermissions;
-//import com.apeng.permissions.OnPermission;
-//import com.apeng.permissions.Permission;
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.Poi;
@@ -71,7 +63,6 @@ import com.google.android.cameraview.demo.util.ImageUtil;
 import com.google.android.cameraview.demo.util.LocationService;
 import com.google.android.cameraview.demo.util.urlhttp.CallBackUtil;
 import com.google.android.cameraview.demo.util.urlhttp.UrlHttpUtil;
-import com.umeng.analytics.MobclickAgent;
 import com.umeng.message.PushAgent;
 
 import org.json.JSONArray;
@@ -88,6 +79,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+
+//import com.apeng.permissions.EsayPermissions;
+//import com.apeng.permissions.OnPermission;
+//import com.apeng.permissions.Permission;
 
 //import myapplication.TestActivity;
 
@@ -219,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     };
     private ImageView mIm_setup;
-    ImageView imageView;
+    ImageView imageView_test;
     TextView tv_projectName;
     TextView tv_projectAdd;//地址信息内容
     TextView project_place;//施工单位内容
@@ -236,6 +231,15 @@ public class MainActivity extends AppCompatActivity implements
     private TextView mTv_test;
     ImageUtil imageUtil;
     private Bitmap mToLeftBottom1;
+    TextView tv_test;
+    public static boolean isOppo() {
+        String manufacturer = Build.MANUFACTURER;
+        //这个字符串可以自己定义,例如判断华为就填写huawei,魅族就填写meizu
+        if ("oppo".equalsIgnoreCase(manufacturer)) {
+            return true;
+        }
+        return false;
+    }
 
     public static boolean isMIUI() {
         String manufacturer = Build.MANUFACTURER;
@@ -273,7 +277,8 @@ public class MainActivity extends AppCompatActivity implements
             fab.setOnClickListener(mOnClickListener);
         }
         //Toolbar toolbar = findViewById(R.id.toolbar);
-        imageView = findViewById(R.id.imview);
+        imageView_test = findViewById(R.id.imview_test);
+
         TextView etName = findViewById(R.id.my_name);
         mIm_setup = findViewById(R.id.iv_setup);
         mTv_test = findViewById(R.id.tv_test_1);
@@ -303,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements
         jtv_place = findViewById(R.id.jtv_place);
         tv_abtain = findViewById(R.id.tv_abtain);
         tv_custom = findViewById(R.id.tv_custom);
-
+        tv_test = findViewById(R.id.text_test);
         tv_projectName = findViewById(R.id.project_name);
         tv_content = findViewById(R.id.tv_content);
         tv_projectName.setText(str_projectname);
@@ -330,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements
                 setUpActivity.putExtra("str_titileShow", str_titileShow);
                 setUpActivity.putExtra("str_abtainCompany", str_abtain);
                 setUpActivity.putExtra("str_add", str_add);
-                setUpActivity.putExtra("str_location", str_location);
+                setUpActivity.putExtra("str_location", tv_projectAdd.getText());
                 setUpActivity.putExtra("str_content", str_content);
                 setUpActivity.putExtra("str_time", str_time);
                 setUpActivity.putExtra("str_longitude_latitude", str_longitude_latitude);
@@ -599,24 +604,13 @@ public class MainActivity extends AppCompatActivity implements
         if (mCameraView != null) {
             mCameraView.setAdjustViewBounds(true);
             mCameraView.setAspectRatio(ratio);
-            /*if ( ratio.toString().equals("16:9")){
-                Toast.makeText(this, ratio.toString(), Toast.LENGTH_SHORT).show();
-                mCameraView.setAdjustViewBounds(false);
-                AspectRatio t_ratio = AspectRatio.parse("4:3");
-                mCameraView.setAspectRatio(t_ratio);
-                is_16_9 = true;
-            }else {
-                mCameraView.setAdjustViewBounds(true);
-                mCameraView.setAspectRatio(ratio);
-                is_16_9 = false;
-            }*/
         }
     }
 
     float canvasTextSize1 = 42;
-    float canvasTextSize2 = 44;
-    float canvasTextSize3 = 46;
-    float canvasTextSize4 = 48;
+    float canvasTextSize2 = 50;
+    float canvasTextSize3 = 58;
+    float canvasTextSize4 = 66;
     private CameraView.Callback mCallback
             = new CameraView.Callback() {
 
@@ -632,12 +626,9 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
         public void onPictureTaken(CameraView cameraView, final byte[] data) {
-//            if (is_16_9){
-//                mCameraView.setAdjustViewBounds(false);
-//                AspectRatio t_ratio = AspectRatio.parse("4:3");
-//                mCameraView.setAspectRatio(t_ratio);
-//            }
+
             Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+
             float bitmapWidth = bitmap.getWidth();
             float bitmapHeight = bitmap.getHeight();
             float ratio = getPxRatio(bitmapWidth, bitmapHeight);
@@ -669,7 +660,7 @@ public class MainActivity extends AppCompatActivity implements
                 list_keyword.add("项目名称：" + str_projectname);
             }
             if (b_add_switch) {
-                list_keyword.add("^_^" + str_location);
+                list_keyword.add("^_^" + tv_projectAdd.getText());
             }
             if (b_content) {
                 list_keyword.add("作业内容：" + str_content);
@@ -686,6 +677,7 @@ public class MainActivity extends AppCompatActivity implements
             if (!b_watermark_switch) {
                 list_keyword.clear();
             }
+//            imageView_test.setImageBitmap(bitmap);
             if (bitmapWidth>bitmapHeight) {
                 bitmap = imageUtil.createDegree(bitmap, 90);
             }
@@ -693,8 +685,10 @@ public class MainActivity extends AppCompatActivity implements
             mToLeftBottom1 = imageUtil.drawTextToLeftBottom(MainActivity.this, bitmap,
                     list_keyword, b_titileShow_switch, str_titileShow,
                     paint, 40 * getPxRatio(bitmap.getWidth(), bitmap.getHeight()), paddingBottom,
-                    background_color_depth_flag, background_color,3);
-            imageView.setImageBitmap(bitmap);
+                    background_color_depth_flag, background_color,5);
+
+            //其他信息情况
+            imageView_test.setImageBitmap(mToLeftBottom1);
             saveImageToGallery_test(mToLeftBottom1);
             String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
             //验证是否许可权限
@@ -723,54 +717,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     };
 
-   /* public static class ConfirmationDialogFragment extends DialogFragment {
-        private static final String ARG_MESSAGE = "message";
-        private static final String ARG_PERMISSIONS = "permissions";
-        private static final String ARG_REQUEST_CODE = "request_code";
-        private static final String ARG_NOT_GRANTED_MESSAGE = "not_granted_message";
-
-        public static ConfirmationDialogFragment newInstance(@StringRes int message,
-                String[] permissions, int requestCode, @StringRes int notGrantedMessage) {
-            ConfirmationDialogFragment fragment = new ConfirmationDialogFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_MESSAGE, message);
-            args.putStringArray(ARG_PERMISSIONS, permissions);
-            args.putInt(ARG_REQUEST_CODE, requestCode);
-            args.putInt(ARG_NOT_GRANTED_MESSAGE, notGrantedMessage);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final Bundle args = getArguments();
-            return new AlertDialog.Builder(getActivity())
-                    .setMessage(args.getInt(ARG_MESSAGE))
-                    .setPositiveButton(android.R.string.ok,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    String[] permissions = args.getStringArray(ARG_PERMISSIONS);
-                                    if (permissions == null) {
-                                        throw new IllegalArgumentException();
-                                    }
-                                    ActivityCompat.requestPermissions(getActivity(),
-                                            permissions, args.getInt(ARG_REQUEST_CODE));
-                                }
-                            })
-                    .setNegativeButton(android.R.string.cancel,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Toast.makeText(getActivity(),
-                                            args.getInt(ARG_NOT_GRANTED_MESSAGE),
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            })
-                    .create();
-        }
-    }*/
 
     /**
      * 为了得到传回的数据，必须在前面的Activity中（指MainActivity类）重写onActivityResult方法
@@ -786,7 +732,9 @@ public class MainActivity extends AppCompatActivity implements
             str_place = "" + data.getExtras().getString("add");
             str_time = "" + data.getExtras().getString("time");
             str_abtain = "" + data.getExtras().getString("et_abtainCompany");
+
             front_size = data.getExtras().getInt("front_size");
+
             b_watermark_switch = data.getExtras().getBoolean("b_watermark_switch");
             b_weather_switch = data.getExtras().getBoolean("b_weather_switch");
             b_longitude_switch = data.getExtras().getBoolean("b_longitude_switch");
@@ -912,23 +860,44 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void setFrontSize() {
-        switch (front_size) {
-            case 0:
-                float dimension = getResources().getDimension(R.dimen.px_text_7);
-                specificFrontSize(dimension);
-                break;
-            case 1:
-                float dimension1 = getResources().getDimension(R.dimen.px_text_8);
-                specificFrontSize(dimension1);
-                break;
-            case 2:
-                float dimension2 = getResources().getDimension(R.dimen.px_text_9);
-                specificFrontSize(dimension2);
-                break;
-            case 3:
-                float dimension3 = getResources().getDimension(R.dimen.px_text_10);
-                specificFrontSize(dimension3);
-                break;
+        if (isOppo()){
+            switch (front_size) {
+                case 0:
+                    float dimension = getResources().getDimension(R.dimen.px_text_4);
+                    specificFrontSize(dimension);
+                    break;
+                case 1:
+                    float dimension1 = getResources().getDimension(R.dimen.px_text_5);
+                    specificFrontSize(dimension1);
+                    break;
+                case 2:
+                    float dimension2 = getResources().getDimension(R.dimen.px_text_6);
+                    specificFrontSize(dimension2);
+                    break;
+                case 3:
+                    float dimension3 = getResources().getDimension(R.dimen.px_text_7);
+                    specificFrontSize(dimension3);
+                    break;
+            }
+        }else{
+            switch (front_size) {
+                case 0:
+                    float dimension = getResources().getDimension(R.dimen.px_text_7);
+                    specificFrontSize(dimension);
+                    break;
+                case 1:
+                    float dimension1 = getResources().getDimension(R.dimen.px_text_8);
+                    specificFrontSize(dimension1);
+                    break;
+                case 2:
+                    float dimension2 = getResources().getDimension(R.dimen.px_text_9);
+                    specificFrontSize(dimension2);
+                    break;
+                case 3:
+                    float dimension3 = getResources().getDimension(R.dimen.px_text_10);
+                    specificFrontSize(dimension3);
+                    break;
+            }
         }
     }
 

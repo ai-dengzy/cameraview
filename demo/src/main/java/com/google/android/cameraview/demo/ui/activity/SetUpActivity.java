@@ -84,7 +84,7 @@ public class SetUpActivity extends AppCompatActivity {
     public boolean b_time_switch = true;
     public boolean b_custom_switch = false;
     public boolean b_titileShow_switch = true;
-    public int background_color = -1;
+    public int background_color = 0;
     public int front_color = -1;
     public int front_color_flag = -1;
     public int front_size_flag=1;
@@ -147,9 +147,9 @@ public class SetUpActivity extends AppCompatActivity {
         b_time_switch = sp.getBoolean("sh_watermark_projecttime",true);
         b_longitude_switch = sp.getBoolean("sh_watermark_longitude",true);
         b_weather_switch = sp.getBoolean("sh_watermark_weather",true);
-        background_color = sp.getInt("background_color",-1);
+        background_color = sp.getInt("background_color",0);
         front_color_flag = sp.getInt("front_color_flag",-1);
-        front_size_flag = sp.getInt("front_size_flag",-1);
+        front_size_flag = sp.getInt("front_size_flag",1);
         background_color_depth_flag = sp.getInt("background_color_depth_flag",1);
 
         //Density.setDensity(getApplication(),this);
@@ -536,7 +536,6 @@ public class SetUpActivity extends AppCompatActivity {
                 mSpEdit.putBoolean("sh_watermark_weather",b_weather_switch);
                 mSpEdit.putBoolean("sh_abtain_switch",b_abtain_switch);
                 mSpEdit.putBoolean("sh_voice_switch",b_voice_switch);
-                mSpEdit.putInt("background_color",background_color);
                 mSpEdit.putInt("background_color",background_color);
                 mSpEdit.putInt("front_color_flag",front_color_flag);
                 mSpEdit.putInt("background_color_depth_flag",background_color_depth_flag);//底色深度值

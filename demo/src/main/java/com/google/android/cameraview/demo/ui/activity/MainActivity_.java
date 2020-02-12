@@ -278,7 +278,7 @@ public class MainActivity_ extends AppCompatActivity implements
             fab.setOnClickListener(mOnClickListener);
         }
         //Toolbar toolbar = findViewById(R.id.toolbar);
-        imageView = findViewById(R.id.imview);
+        imageView = findViewById(R.id.imview_test);
         TextView etName = findViewById(R.id.my_name);
         mIm_setup = findViewById(R.id.iv_setup);
         mTv_test = findViewById(R.id.tv_test_1);
