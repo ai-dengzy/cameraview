@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements
                         if (b_voice_switch) {
                             sp.play(music, 1, 1, 0, 0, 1);
                         }
-                        mToast = Toast.makeText(MainActivity.this, "图片保存中...", Toast.LENGTH_LONG);
+                        mToast = Toast.makeText(MainActivity.this, "图片保存中", Toast.LENGTH_LONG);
                         mToast.show();
                         mCameraView.takePicture();
                     }
@@ -253,6 +253,18 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (isMIUI()) {
+            isXiMi = true;
+            Log.d(TAG, "onCreate: 是小米");
+            Intent intent = new Intent(MainActivity.this, MMActiviry.class);
+            startActivity(intent);
+            finish();
+            return;
+        } else {
+            isXiMi = false;
+            Log.d(TAG, "onCreate: 不是 小米");
+        }
 
         WindowManager wm = this.getWindowManager();
         double width = wm.getDefaultDisplay().getWidth();
@@ -410,9 +422,10 @@ public class MainActivity extends AppCompatActivity implements
 //                intent.setType("image/*");
 //                startActivity(intent);
 
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-                startActivity(intent);
+                finish();
+//                Intent intent = new Intent(Intent.ACTION_VIEW);
+//                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+//                startActivity(intent);
             }
         });
 
@@ -486,13 +499,6 @@ public class MainActivity extends AppCompatActivity implements
             mLl_takened.setLayoutParams(layoutParams1);
         }
 
-        if (isMIUI()) {
-            isXiMi = true;
-            Log.d(TAG, "onCreate: 是小米");
-        } else {
-            isXiMi = false;
-            Log.d(TAG, "onCreate: 不是 小米");
-        }
         //不添加华为手机百度地图获取不到数据
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
@@ -521,12 +527,12 @@ public class MainActivity extends AppCompatActivity implements
             public void onNullRusult() {
                 //申请权限,开启第二套方案
 //                requestPermission();
-                mCameraView.stop();
+               /* mCameraView.stop();
                 Log.d(TAG, "111111111111111111: ");
                 mCameraView = null;//不设置为null，MMActiviry.class中的camerakit相机打不开
                 Intent intent = new Intent(MainActivity.this, MMActiviry.class);
                 startActivity(intent);
-                finish();
+                finish();*/
             }
         });
 
@@ -688,7 +694,7 @@ public class MainActivity extends AppCompatActivity implements
                     background_color_depth_flag, background_color,5);
 
             //其他信息情况
-            imageView_test.setImageBitmap(mToLeftBottom1);
+//            imageView_test.setImageBitmap(mToLeftBottom1);
             saveImageToGallery_test(mToLeftBottom1);
             String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
             //验证是否许可权限
@@ -732,9 +738,8 @@ public class MainActivity extends AppCompatActivity implements
             str_place = "" + data.getExtras().getString("add");
             str_time = "" + data.getExtras().getString("time");
             str_abtain = "" + data.getExtras().getString("et_abtainCompany");
-
+            str_longitude_latitude = "" + data.getExtras().getString("et_longitude_latitude");
             front_size = data.getExtras().getInt("front_size");
-
             b_watermark_switch = data.getExtras().getBoolean("b_watermark_switch");
             b_weather_switch = data.getExtras().getBoolean("b_weather_switch");
             b_longitude_switch = data.getExtras().getBoolean("b_longitude_switch");
@@ -1107,9 +1112,6 @@ public class MainActivity extends AppCompatActivity implements
                 str_latitude = location.getLatitude() + "";
                 sb.append(location.getLatitude());
                 sb.append("\nlongtitude : ");// 经度
-                str_longitude = location.getLongitude() + "";
-                str_longitude_latitude = str_longitude + "/" + str_latitude;
-                project_logitude_latitude.setText(str_longitude_latitude);
                 sb.append(location.getLongitude());
                 sb.append("\nradius : ");// 半径
                 sb.append(location.getRadius());
@@ -1131,10 +1133,14 @@ public class MainActivity extends AppCompatActivity implements
                 sb.append(location.getTown());
                 sb.append("\nStreet : ");// 街道
                 sb.append(location.getStreet());
+                sb.append(location.getStreet());
                 sb.append("\naddr : ");// 地址信息
                 str_location = location.getAddrStr();
                 if (!isSaved) {
                     tv_projectAdd.setText(location.getAddrStr());
+                    str_longitude = location.getLongitude() + "";
+                    str_longitude_latitude = str_longitude + "/" + str_latitude;
+                    project_logitude_latitude.setText(str_longitude_latitude);
                 }
                 sb.append(location.getAddrStr());
                 sb.append("\nStreetNumber : ");// 获取街道号码

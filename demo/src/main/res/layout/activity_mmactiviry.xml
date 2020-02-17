@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.camerakit.CameraKitView
+         <!--   <com.camerakit.CameraKitView
                 android:id="@+id/camera"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -37,15 +37,26 @@
                 app:camera_focus="continuous"
                 app:camera_imageJpegQuality="100"
                 app:camera_imageMegaPixels="2.0"
-                app:camera_permissions="camera" />
-
-            <Button
+                app:camera_permissions="camera" />-->
+            <com.wonderkiln.camerakit.CameraView
+                xmlns:camerakit="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/camera"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                camerakit:ckCropOutput="false"
+                camerakit:ckFlash="off"
+                camerakit:ckFocus="tap"
+                camerakit:ckJpegQuality="100"
+                camerakit:ckMethod="standard"
+                camerakit:ckPermissions="strict" />
+         <!--   <Button
                 android:id="@+id/permissionsButton1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="Approve Permissions"
-                android:visibility="gone" />
+                android:visibility="gone" />-->
 
             <ImageView
                 android:id="@+id/imageView1"
@@ -54,6 +65,8 @@
                 android:layout_gravity="top|center_horizontal"
                 android:layout_margin="16dp"
                 android:alpha="1.0"
+                android:visibility="gone"
+                android:background="@color/badge_color"
                 android:scaleType="centerInside" />
 
             <LinearLayout
@@ -123,10 +136,10 @@
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_margin="12dp">
-
+<!--        android:background="@drawable/ic_gallery"-->
         <ImageView
             android:id="@+id/main_menu_gallery1"
-            android:background="@drawable/ic_gallery"
+            android:background="@drawable/icon_leftarrow"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="@dimen/px_50"
@@ -172,15 +185,16 @@
 
         </LinearLayout>
 
-        <android.support.design.widget.FloatingActionButton
+        <Button
             android:id="@+id/photoButton"
             android:layout_centerHorizontal="true"
-            android:layout_width="214dp"
+            android:layout_width="@dimen/px_100"
             android:layout_centerVertical="true"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/px_100"
             android:layout_gravity="center_horizontal|bottom"
             android:layout_marginBottom="12dp"
-            android:src="@drawable/ic_photo" />
+            android:background="@drawable/icon_tokened"
+            />
 
         <LinearLayout
             android:layout_width="wrap_content"

@@ -62,12 +62,13 @@
             android:layout_weight="1"
             android:layout_height="1dp"
             android:layout_width="0dp" />
+
+        <!--            android:background="@drawable/ic_gallery"-->
         <ImageView
             android:layout_gravity="center_vertical"
             android:id="@+id/iv_photos"
-            android:visibility="invisible"
             android:layout_marginRight="@dimen/px_40"
-            android:background="@drawable/ic_gallery"
+            android:background="@drawable/icon_leftarrow"
             android:layout_height="@dimen/px_65"
             android:layout_width="@dimen/px_70"
             android:layout_marginEnd="@dimen/px_40" />

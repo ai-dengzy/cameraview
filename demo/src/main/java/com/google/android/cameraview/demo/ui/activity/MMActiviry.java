@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.media.AudioManager;
@@ -33,36 +32,44 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.apeng.permissions.EsayPermissions;
+import com.apeng.permissions.OnPermission;
+import com.apeng.permissions.Permission;
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.Poi;
 import com.baidu.location.PoiRegion;
-import com.camerakit.CameraKit;
-import com.camerakit.CameraKitView;
-import com.camerakit.type.CameraSize;
+import com.google.android.cameraview.demo.CaptureListener;
+import com.google.android.cameraview.demo.CommonUtil;
 import com.google.android.cameraview.demo.DemoApplication;
 import com.google.android.cameraview.demo.R;
 import com.google.android.cameraview.demo.util.ImageUtil;
 import com.google.android.cameraview.demo.util.LocationService;
 import com.google.android.cameraview.demo.util.urlhttp.CallBackUtil;
 import com.google.android.cameraview.demo.util.urlhttp.UrlHttpUtil;
-import com.jpegkit.Jpeg;
+import com.wonderkiln.camerakit.CameraKit;
+import com.wonderkiln.camerakit.CameraKitError;
+import com.wonderkiln.camerakit.CameraKitEvent;
+import com.wonderkiln.camerakit.CameraKitEventListener;
+import com.wonderkiln.camerakit.CameraKitImage;
+import com.wonderkiln.camerakit.CameraKitVideo;
+import com.wonderkiln.camerakit.CameraView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -78,9 +85,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
+public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemClickListener, CaptureListener,CameraKitEventListener {
     private static int LIGHT_FLAG = 0;//0：自动；1：关闭；2：打开
-    private CameraKitView cameraView;
+    private CameraView cameraView;
     private Toolbar toolbar;
     private LocationService locationService;
     private TextView facingText;
@@ -91,12 +98,12 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
     private Button flashOnButton;
     private Button flashOffButton;
 
-    private FloatingActionButton photoButton;
+    private Button photoButton;
 
     private Button facingFrontButton;
     private Button facingBackButton;
 
-    private Button permissionsButton;
+//    private Button permissionsButton;
 
     private ImageView imageView;
     private ImageView mIm_light;
@@ -175,13 +182,25 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
     private LinearLayout mLl_takened;
     private TextView mTv_test;
     ImageUtil imageUtil;
+    private Bitmap mToLeftBottom1;
+
+    public static boolean isOppo() {
+        String manufacturer = Build.MANUFACTURER;
+        //这个字符串可以自己定义,例如判断华为就填写huawei,魅族就填写meizu
+        if ("oppo".equalsIgnoreCase(manufacturer)) {
+            return true;
+        }
+        return false;
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mmactiviry);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         cameraView = findViewById(R.id.camera);
-
+        cameraView.setFacing(CameraKit.Constants.FACING_BACK);
+        cameraView.addCameraKitListener(this);
         toolbar = findViewById(R.id.toolbar);
         toolbar.inflateMenu(R.menu.main);
         toolbar.setOnMenuItemClickListener(this);
@@ -197,15 +216,11 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
         flashOnButton = findViewById(R.id.flashOnButton);
         flashOffButton = findViewById(R.id.flashOffButton);
 
-        flashOnButton.setOnClickListener(flashOnOnClickListener);
-        flashOffButton.setOnClickListener(flashOffOnClickListener);
 
         facingFrontButton = findViewById(R.id.facingFrontButton);
         facingBackButton = findViewById(R.id.facingBackButton);
 
-        facingFrontButton.setOnClickListener(facingFrontOnClickListener);
-        facingBackButton.setOnClickListener(facingBackOnClickListener);
-        permissionsButton = findViewById(R.id.permissionsButton1);
+//        permissionsButton = findViewById(R.id.permissionsButton1);
 
         project_place = findViewById(R.id.project_place);
         project_time = findViewById(R.id.project_time);
@@ -269,59 +284,15 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
         str_content = mSharedPreferences.getString("et_content", "str_作业内容");
         str_titileShow = mSharedPreferences.getString("et_titileShow", "str_作业内容");
         str_place = mSharedPreferences.getString("et_projectAdd", "str_施工单位");
-
-        permissionsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cameraView.requestPermissions(MMActiviry.this);
-            }
-        });
-
         imageView = findViewById(R.id.imageView1);
-
-        cameraView.setPermissionsListener(new CameraKitView.PermissionsListener() {
-            @Override
-            public void onPermissionsSuccess() {
-                permissionsButton.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onPermissionsFailure() {
-                permissionsButton.setVisibility(View.VISIBLE);
-            }
-        });
-
-        cameraView.setCameraListener(new CameraKitView.CameraListener() {
-            @Override
-            public void onOpened() {
-                Log.v("CameraKitView", "CameraListener: onOpened()");
-            }
-
-            @Override
-            public void onClosed() {
-                Log.v("CameraKitView", "CameraListener: onClosed()");
-            }
-        });
-
-        cameraView.setPreviewListener(new CameraKitView.PreviewListener() {
-            @Override
-            public void onStart() {
-                Log.v("CameraKitView", "PreviewListener: onStart()");
-                updateInfoText();
-            }
-
-            @Override
-            public void onStop() {
-                Log.v("CameraKitView", "PreviewListener: onStop()");
-            }
-        });
         //打开相册
         findViewById(R.id.main_menu_gallery1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-                startActivity(intent);
+//                Intent intent = new Intent(Intent.ACTION_VIEW);
+//                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+//                startActivity(intent);
+                finish();
             }
         });
 
@@ -329,12 +300,7 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
         findViewById(R.id.switch_camera).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int facing = cameraView.getFacing();
-                if (facing==CameraKit.FACING_BACK){
-                    cameraView.setFacing(CameraKit.FACING_FRONT);
-                }else if (facing==CameraKit.FACING_FRONT){
-                    cameraView.setFacing(CameraKit.FACING_BACK);
-                }
+                cameraView.toggleFacing();
             }
         });
         //设置
@@ -356,7 +322,6 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
                 startActivityForResult(setUpActivity, 0);
             }
         });
-        cameraView.setFlash(CameraKit.FLASH_AUTO);
         //闪光灯
         mIm_light = findViewById(R.id.switch_flash);
         mIm_light.setOnClickListener(new View.OnClickListener() {
@@ -366,23 +331,17 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
                     case 0://当闪关灯自动状态
                         //设置为关闭
                         LIGHT_FLAG = 1;
-                        cameraView.setFlash(CameraKit.FLASH_OFF);
-                        mIm_light.setBackground(MMActiviry.this.getResources().getDrawable(
-                                R.drawable.icon_light_close));
+
                         break;
                     case 1://当闪光灯关闭状态
                         //设置为打开
                         LIGHT_FLAG = 2;
-                        cameraView.setFlash(CameraKit.FLASH_ON);
-                        mIm_light.setBackground(MMActiviry.this.getResources().getDrawable(
-                                R.drawable.icon_light_open));
+
                         break;
                     case 2://当闪光灯打开状态
                         //设置为打开
                         LIGHT_FLAG = 0;
-                        cameraView.setFlash(CameraKit.FLASH_AUTO);
-                        mIm_light.setBackground(MMActiviry.this.getResources().getDrawable(
-                                R.drawable.icon_light));
+
                         break;
                 }
             }
@@ -466,12 +425,40 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
         } else {
             tv_custom.setVisibility(View.GONE);
         }
+
+            EsayPermissions.with(this)
+                    .constantRequest() //可设置被拒绝后继续申请，直到用户授权或者永久拒绝
+//                .permission(Permission.SYSTEM_ALERT_WINDOW, Permission.REQUEST_INSTALL_PACKAGES) //支持请求6.0悬浮窗权限8.0请求安装权限
+                    .permission(Permission.WRITE_EXTERNAL_STORAGE, Permission.CAMERA, Permission.RECORD_AUDIO)
+                    .request(new OnPermission() {
+                        @Override
+                        public void hasPermission(List<String> granted, boolean isAll) {
+                            if (isAll) {
+                                Toast.makeText(MMActiviry.this, "获取权限成功", Toast.LENGTH_LONG).show();
+//                                startActivity(new Intent(MMActiviry.this, TestActivity.class));
+                            } else {
+                                Toast.makeText(MMActiviry.this, "取权限成功，部分权限未正常授予", Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void noPermission(List<String> denied, boolean quick) {
+                            if (quick) {
+                                Toast.makeText(MMActiviry.this, "被永久拒绝授权，请手动授予权限", Toast.LENGTH_LONG).show();
+                                //如果是被永久拒绝就跳转到应用权限系统设置页面
+                                EsayPermissions.gotoPermissionSettings(MMActiviry.this);
+                            } else {
+                                Toast.makeText(MMActiviry.this, "获取权限失败", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+
+        setCaptureLisenter(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        cameraView.onStart();
         locationService = ((DemoApplication) getApplication()).locationService;
         //获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity
         // ，都是通过此种方式获取locationservice实例的
@@ -487,27 +474,26 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
     @Override
     public void onResume() {
         super.onResume();
-        cameraView.onResume();
+        cameraView.start();
     }
 
     @Override
     public void onPause() {
+        cameraView.stop();
         super.onPause();
-        cameraView.onPause();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        cameraView.onStop();
         locationService.unregisterListener(mListener); //注销掉监听
         locationService.stop(); //停止定位服务
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        cameraView.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    protected void onDestroy() {
+        super.onDestroy();
+        cameraView.stop();
     }
 
     @Override
@@ -708,159 +694,16 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
     float canvasTextSize2 = 44;
     float canvasTextSize3 = 46;
     float canvasTextSize4 = 48;
+    private CaptureListener captureLisenter;        //按钮回调接口
     private View.OnClickListener photoOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            cameraView.captureImage(new CameraKitView.ImageCallback() {
-                @Override
-                public void onImage(CameraKitView view, final byte[] photo) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final Bitmap bitmap = BitmapFactory.decodeByteArray(photo, 0, photo.length);
-                            final Jpeg jpeg = new Jpeg(photo);
-                            final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                            paint.setColor(front_color);
-                            imageView.post(new Runnable() {
-                                @Override
-                                public void run() {
-//                                    imageView.setImageBitmap(bitmap);
-                                    float bitmapWidth = bitmap.getWidth();
-                                    float bitmapHeight = bitmap.getHeight();
-                                    float ratio = getPxRatio(bitmapWidth, bitmapHeight);
-                                    switch (front_size) {
-                                        case 0:
-                                            paint_size = canvasTextSize1 * ratio;
-                                            break;
-                                        case 1:
-                                            paint_size = canvasTextSize2 * ratio;
-                                            break;
-                                        case 2:
-                                            paint_size = canvasTextSize3 * ratio;
-                                            break;
-                                        case 3:
-                                            paint_size = canvasTextSize4 * ratio;
-                                            break;
-                                    }
-                                    paint.setTextSize(paint_size);
-                                    list_keyword.clear();
-//                                    if (b_place_switch) {
-                                        list_keyword.add("施工单位：" + str_place);
-//                                    }
-//                                    if (b_abtain_switch) {
-                                        list_keyword.add("取证单位：" + str_abtain);
-//                                    }
-//                                    if (b_projectname_switch) {
-                                        list_keyword.add("项目名称：" + str_projectname);
-//                                    }
-//                                    if (b_add_switch) {
-                                        list_keyword.add("^_^" + str_location);
-//                                    }
-//                                    if (b_content) {
-                                        list_keyword.add("作业内容：" + str_content);
-//                                    }
-//                                    if (b_time_switch) {
-                                        list_keyword.add("当前日期：" + str_time);
-//                                    }
-//                                    if (b_longitude_switch) {
-                                        list_keyword.add("经纬度数：" + str_longitude_latitude);
-//                                    }
-//                                    if (b_weather_switch) {
-                                        list_keyword.add("天气状况：" + str_weather);
-//                                    }
-                                    /*if (!b_watermark_switch) {
-                                        list_keyword.clear();
-                                    }*/
-//                                    float paddingBottom = 100 * getPxRatio(bitmap.getWidth(), bitmap.getHeight());
-                                    float paddingBottom = 100 * getPxRatio(bitmap.getWidth(), bitmap.getHeight());
-                                    Bitmap toLeftBottom1 = imageUtil.drawTextToLeftBottom(MMActiviry.this, bitmap,
-                                            list_keyword, b_titileShow_switch, str_titileShow,
-                                            paint, 40 * getPxRatio(bitmap.getWidth(), bitmap.getHeight()), paddingBottom,
-                                            background_color_depth_flag, background_color,4);
-//                                    imageView.setImageBitmap(toLeftBottom1);
-                                    saveImageToGallery_test(toLeftBottom1);
-                                    Toast.makeText(MMActiviry.this, "保存中", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                    }).start();
-                }
-            });
+            //回调拍照接口
+            captureLisenter.takePictures();
         }
     };
 
-    private View.OnClickListener flashOnOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (cameraView.getFlash() != CameraKit.FLASH_ON) {
-                cameraView.setFlash(CameraKit.FLASH_ON);
-                updateInfoText();
-            }
-        }
-    };
 
-    private View.OnClickListener flashOffOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (cameraView.getFlash() != CameraKit.FLASH_OFF) {
-                cameraView.setFlash(CameraKit.FLASH_OFF);
-                updateInfoText();
-            }
-        }
-    };
-
-    private View.OnClickListener facingFrontOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            cameraView.setFacing(CameraKit.FACING_FRONT);
-        }
-    };
-
-    private View.OnClickListener facingBackOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            cameraView.setFacing(CameraKit.FACING_BACK);
-        }
-    };
-
-    private void updateInfoText() {
-        String facingValue = cameraView.getFacing() == CameraKit.FACING_BACK ? "BACK" : "FRONT";
-//        facingText.setText(Html.fromHtml("<b>Facing:</b> " + facingValue));
-
-        String flashValue = "OFF";
-        switch (cameraView.getFlash()) {
-            case CameraKit.FLASH_OFF: {
-                flashValue = "OFF";
-                break;
-            }
-
-            case CameraKit.FLASH_ON: {
-                flashValue = "ON";
-                break;
-            }
-
-            case CameraKit.FLASH_AUTO: {
-                flashValue = "AUTO";
-                break;
-            }
-
-            case CameraKit.FLASH_TORCH: {
-                flashValue = "TORCH";
-                break;
-            }
-        }
-//        flashText.setText(Html.fromHtml("<b>Flash:</b> " + flashValue));
-
-        CameraSize previewSize = cameraView.getPreviewResolution();
-        if (previewSize != null) {
-//            previewSizeText.setText(Html.fromHtml(String.format("<b>Preview Resolution:</b> %d x %d", previewSize.getWidth(), previewSize.getHeight())));
-        }
-
-        CameraSize photoSize = cameraView.getPhotoResolution();
-        if (photoSize != null) {
-//            photoSizeText.setText(Html.fromHtml(String.format("<b>Photo Resolution:</b> %d x %d", photoSize.getWidth(), photoSize.getHeight())));
-        }
-    }
 
     private void saveImageToGallery_test(Bitmap bitmap) {
         //生成路径
@@ -882,7 +725,7 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
             fos = new FileOutputStream(file);
             final FileOutputStream finalFos = fos;
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, finalFos);
-            Toast.makeText(this, "已保存", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "已保存....", Toast.LENGTH_SHORT).show();
             fos.flush();
             //通知系统相册刷新
             sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
@@ -924,6 +767,7 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
         try {
             FileOutputStream fos = new FileOutputStream(file);
             bmp.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            Toast.makeText(this, "已保存", Toast.LENGTH_SHORT).show();
             fos.flush();
             fos.close();
         } catch (Exception e) {
@@ -977,6 +821,7 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
                 // 插入图库
                 MediaStore.Images.Media.insertImage(getContentResolver(), file.getAbsolutePath(),
                         format.format(new Date()) + ".JPEG", null);
+                Toast.makeText(this, "已保存", Toast.LENGTH_SHORT).show();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -1058,52 +903,45 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
     }
 
     private void setFrontSize() {
-        switch (front_size) {
-            case 0:
-                float dimension = getResources().getDimension(R.dimen.px_text_7);
-                specificFrontSize(dimension);
-                jtv_logitude.setTextSize(getResources().getDimension(R.dimen.px_text_7));
-                jtv_time.setTextSize(getResources().getDimension(R.dimen.px_text_7));
-                jtv_weather.setTextSize(getResources().getDimension(R.dimen.px_text_7));
-                jtv_content.setTextSize(getResources().getDimension(R.dimen.px_text_7));
-                jtv_projectName.setTextSize(getResources().getDimension(R.dimen.px_text_7));
-                jtv_abtain.setTextSize(getResources().getDimension(R.dimen.px_text_7));
-                jtv_place.setTextSize(getResources().getDimension(R.dimen.px_text_7));
-                tv_fixed_add.setTextSize(getResources().getDimension(R.dimen.px_text_7));
-                break;
-            case 1:
-                float dimension1 = getResources().getDimension(R.dimen.px_text_8);
-                specificFrontSize(dimension1);
-                jtv_time.setTextSize(getResources().getDimension(R.dimen.px_text_8));
-                jtv_weather.setTextSize(getResources().getDimension(R.dimen.px_text_8));
-                jtv_content.setTextSize(getResources().getDimension(R.dimen.px_text_8));
-                jtv_projectName.setTextSize(getResources().getDimension(R.dimen.px_text_8));
-                jtv_abtain.setTextSize(getResources().getDimension(R.dimen.px_text_8));
-                jtv_place.setTextSize(getResources().getDimension(R.dimen.px_text_8));
-                tv_fixed_add.setTextSize(getResources().getDimension(R.dimen.px_text_8));
-                break;
-            case 2:
-                float dimension2 = getResources().getDimension(R.dimen.px_text_9);
-                specificFrontSize(dimension2);
-                jtv_time.setTextSize(getResources().getDimension(R.dimen.px_text_9));
-                jtv_weather.setTextSize(getResources().getDimension(R.dimen.px_text_9));
-                jtv_content.setTextSize(getResources().getDimension(R.dimen.px_text_9));
-                jtv_projectName.setTextSize(getResources().getDimension(R.dimen.px_text_9));
-                jtv_abtain.setTextSize(getResources().getDimension(R.dimen.px_text_9));
-                jtv_place.setTextSize(getResources().getDimension(R.dimen.px_text_9));
-                tv_fixed_add.setTextSize(getResources().getDimension(R.dimen.px_text_9));
-                break;
-            case 3:
-                float dimension3 = getResources().getDimension(R.dimen.px_text_10);
-                specificFrontSize(dimension3);
-                jtv_time.setTextSize(getResources().getDimension(R.dimen.px_text_10));
-                jtv_weather.setTextSize(getResources().getDimension(R.dimen.px_text_10));
-                jtv_content.setTextSize(getResources().getDimension(R.dimen.px_text_10));
-                jtv_projectName.setTextSize(getResources().getDimension(R.dimen.px_text_10));
-                jtv_abtain.setTextSize(getResources().getDimension(R.dimen.px_text_10));
-                jtv_place.setTextSize(getResources().getDimension(R.dimen.px_text_10));
-                tv_fixed_add.setTextSize(getResources().getDimension(R.dimen.px_text_10));
-                break;
+
+        if (isOppo()){
+            switch (front_size) {
+                case 0:
+                    float dimension = getResources().getDimension(R.dimen.px_text_4);
+                    specificFrontSize(dimension);
+                    break;
+                case 1:
+                    float dimension1 = getResources().getDimension(R.dimen.px_text_5);
+                    specificFrontSize(dimension1);
+                    break;
+                case 2:
+                    float dimension2 = getResources().getDimension(R.dimen.px_text_6);
+                    specificFrontSize(dimension2);
+                    break;
+                case 3:
+                    float dimension3 = getResources().getDimension(R.dimen.px_text_7);
+                    specificFrontSize(dimension3);
+                    break;
+            }
+        }else{
+            switch (front_size) {
+                case 0:
+                    float dimension = getResources().getDimension(R.dimen.px_text_7);
+                    specificFrontSize(dimension);
+                    break;
+                case 1:
+                    float dimension1 = getResources().getDimension(R.dimen.px_text_8);
+                    specificFrontSize(dimension1);
+                    break;
+                case 2:
+                    float dimension2 = getResources().getDimension(R.dimen.px_text_9);
+                    specificFrontSize(dimension2);
+                    break;
+                case 3:
+                    float dimension3 = getResources().getDimension(R.dimen.px_text_10);
+                    specificFrontSize(dimension3);
+                    break;
+            }
         }
     }
 
@@ -1326,5 +1164,138 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
             tv_custom.setVisibility(View.GONE);
         }
     }
+
+    public void setCaptureLisenter(CaptureListener captureLisenter) {
+        this.captureLisenter = captureLisenter;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,@NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 101:
+                if (mToLeftBottom1!=null)
+                    saveImageToGallery_test(mToLeftBottom1);
+                break;
+        }
+    }
+
+    @Override
+    public void takePictures() {
+        cameraView.captureImage();
+    }
+
+    @Override
+    public void recordShort(long time) {
+
+    }
+
+    @Override
+    public void recordStart() {
+
+    }
+
+    @Override
+    public void recordEnd(long time) {
+
+    }
+
+    @Override
+    public void recordZoom(float zoom) {
+
+    }
+
+    @Override
+    public void recordError() {
+
+    }
+
+    @Override
+    public void onEvent(CameraKitEvent cameraKitEvent) {
+
+    }
+
+    @Override
+    public void onError(CameraKitError cameraKitError) {
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public void onImage(CameraKitImage cameraKitImage) {
+        Bitmap bitmap;
+        if (cameraView.isFacingFront()) {
+            bitmap = CommonUtil.loadBitmap(cameraKitImage.getJpeg());
+        } else {
+            bitmap = cameraKitImage.getBitmap();
+        }
+        //imageView.setImageBitmap(bitmap);
+        final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setColor(front_color);
+        float bitmapWidth = bitmap.getWidth();
+        float bitmapHeight = bitmap.getHeight();
+        float ratio = getPxRatio(bitmapWidth, bitmapHeight);
+        switch (front_size) {
+            case 0:
+                paint_size = canvasTextSize1 * ratio;
+                break;
+            case 1:
+                paint_size = canvasTextSize2 * ratio;
+                break;
+            case 2:
+                paint_size = canvasTextSize3 * ratio;
+                break;
+            case 3:
+                paint_size = canvasTextSize4 * ratio;
+                break;
+        }
+        paint.setTextSize(paint_size);
+        list_keyword.clear();
+        if (b_place_switch) {
+            list_keyword.add("施工单位：" + str_place);
+        }
+        if (b_abtain_switch) {
+            list_keyword.add("取证单位：" + str_abtain);
+        }
+        if (b_projectname_switch) {
+            list_keyword.add("项目名称：" + str_projectname);
+        }
+        if (b_add_switch) {
+            list_keyword.add("^_^" + tv_projectAdd.getText());
+        }
+        if (b_content) {
+            list_keyword.add("作业内容：" + str_content);
+        }
+        if (b_time_switch) {
+            list_keyword.add("当前日期：" + str_time);
+        }
+        if (b_longitude_switch) {
+            list_keyword.add("经纬度数：" + str_longitude_latitude);
+        }
+        if (b_weather_switch) {
+            list_keyword.add("天气状况：" + str_weather);
+        }
+        if (!b_watermark_switch) {
+            list_keyword.clear();
+        }
+        if (bitmapWidth>bitmapHeight) {
+            bitmap = imageUtil.createDegree(bitmap, 90);
+        }
+        float paddingBottom = 150 * getPxRatio(bitmap.getWidth(), bitmap.getHeight());
+        mToLeftBottom1 = imageUtil.drawTextToLeftBottom(MMActiviry.this, bitmap,
+                list_keyword, b_titileShow_switch, str_titileShow,
+                paint, 40 * getPxRatio(bitmap.getWidth(), bitmap.getHeight()), paddingBottom,
+                background_color_depth_flag, background_color,6);
+//                                imageView.setImageBitmap(toLeftBottom1);
+        saveImageToGallery_test(mToLeftBottom1);
+//        Toast.makeText(MMActiviry.this, "已保存", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onVideo(CameraKitVideo cameraKitVideo) {
+
+    }
+
+
+
 }
 

@@ -440,7 +440,6 @@
                 android:id="@+id/et_longitude_latitude"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:editable="false"
                 android:layout_marginTop="20dp"
                 android:layout_marginLeft="@dimen/px_15"
                 android:textColor="#ffffff"

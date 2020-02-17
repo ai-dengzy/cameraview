@@ -52,11 +52,12 @@
 
         <activity
             android:name=".ui.activity.SetUpActivity"
+            android:windowSoftInputMode="adjustPan"
             android:label="@string/title_activity_set_up" />
 
         <activity android:name=".ui.activity.MMActiviry"
             android:screenOrientation="portrait">
-            <!--<intent-filter>
+        <!--    <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>-->
