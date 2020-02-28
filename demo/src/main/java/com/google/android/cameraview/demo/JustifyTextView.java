@@ -92,7 +92,6 @@ public class JustifyTextView extends TextView {
             canvas.drawText(blanks, x, mLineY, getPaint());
             float bw = StaticLayout.getDesiredWidth(blanks, getPaint());
             x += bw;
-
             line = line.substring(3);
         }
 

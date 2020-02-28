@@ -45,6 +45,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,6 +64,7 @@ import com.google.android.cameraview.demo.util.ImageUtil;
 import com.google.android.cameraview.demo.util.LocationService;
 import com.google.android.cameraview.demo.util.urlhttp.CallBackUtil;
 import com.google.android.cameraview.demo.util.urlhttp.UrlHttpUtil;
+import com.umeng.message.PushAgent;
 import com.wonderkiln.camerakit.CameraKit;
 import com.wonderkiln.camerakit.CameraKitError;
 import com.wonderkiln.camerakit.CameraKitEvent;
@@ -86,6 +88,8 @@ import java.util.Date;
 import java.util.List;
 
 public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemClickListener, CaptureListener,CameraKitEventListener {
+    private static final double RAIO_WIDTH = 3;
+    private static final double RAIO_HEIGHT = 4;
     private static int LIGHT_FLAG = 0;//0：自动；1：关闭；2：打开
     private CameraView cameraView;
     private Toolbar toolbar;
@@ -179,10 +183,15 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
     private List<String> list_keyword;
     ImageView iv_light;
     private SharedPreferences mSharedPreferences;
-    private LinearLayout mLl_takened;
+    private RelativeLayout mLl_takened;
     private TextView mTv_test;
     ImageUtil imageUtil;
     private Bitmap mToLeftBottom1;
+    double screenWidth;
+    double screenHeight;
+    double cameraHeight;
+    double temp_offbottom;
+    private int mHeight;
 
     public static boolean isOppo() {
         String manufacturer = Build.MANUFACTURER;
@@ -196,32 +205,33 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mmactiviry);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        StatusBarCompat.setStatusBarColor(this,getResources().getColor(R.color.black),0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            //透明
+            getWindow().setFlags(
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
         cameraView = findViewById(R.id.camera);
         cameraView.setFacing(CameraKit.Constants.FACING_BACK);
         cameraView.addCameraKitListener(this);
+
+//        ViewGroup.LayoutParams lp1;
+//        lp1= cameraView.getLayoutParams();
+//        lp1.height= (int) getResources().getDimension(R.dimen.px_900);
+//        cameraView.setLayoutParams(lp1);
+
         toolbar = findViewById(R.id.toolbar);
         toolbar.inflateMenu(R.menu.main);
         toolbar.setOnMenuItemClickListener(this);
-
-        facingText = findViewById(R.id.facingText1);
-        flashText = findViewById(R.id.flashText1);
-        previewSizeText = findViewById(R.id.previewSizeText1);
-        photoSizeText = findViewById(R.id.photoSizeText1);
-
         photoButton = findViewById(R.id.photoButton);
         photoButton.setOnClickListener(photoOnClickListener);
-
         flashOnButton = findViewById(R.id.flashOnButton);
         flashOffButton = findViewById(R.id.flashOffButton);
-
-
         facingFrontButton = findViewById(R.id.facingFrontButton);
         facingBackButton = findViewById(R.id.facingBackButton);
-
 //        permissionsButton = findViewById(R.id.permissionsButton1);
-
         project_place = findViewById(R.id.project_place);
         project_time = findViewById(R.id.project_time);
         ll_titile_background = findViewById(R.id.ll_titile_background);
@@ -285,6 +295,9 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
         str_titileShow = mSharedPreferences.getString("et_titileShow", "str_作业内容");
         str_place = mSharedPreferences.getString("et_projectAdd", "str_施工单位");
         imageView = findViewById(R.id.imageView1);
+        iniData();
+        //友盟推送
+        PushAgent.getInstance(this).onAppStart();
         //打开相册
         findViewById(R.id.main_menu_gallery1).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -327,138 +340,132 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
         mIm_light.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                switch (LIGHT_FLAG) {
-                    case 0://当闪关灯自动状态
-                        //设置为关闭
-                        LIGHT_FLAG = 1;
-
-                        break;
-                    case 1://当闪光灯关闭状态
-                        //设置为打开
-                        LIGHT_FLAG = 2;
-
-                        break;
-                    case 2://当闪光灯打开状态
-                        //设置为打开
-                        LIGHT_FLAG = 0;
-
-                        break;
+                if (cameraView != null) {
+                    switch (LIGHT_FLAG) {
+                        case 0://当闪关灯自动状态
+                            //设置为关闭
+                            LIGHT_FLAG = 1;
+                            cameraView.setFlash(CameraKit.Constants.FLASH_OFF);
+                            mIm_light.setBackground(MMActiviry.this.getResources().getDrawable(
+                                    R.drawable.icon_light_close));
+                            break;
+                        case 1://当闪光灯关闭状态
+                            //设置为打开
+                            LIGHT_FLAG = 2;
+                            cameraView.setFlash(CameraKit.Constants.FLASH_ON);
+                            mIm_light.setBackground(MMActiviry.this.getResources().getDrawable(
+                                    R.drawable.icon_light_open));
+                            break;
+                        case 2://当闪光灯打开状态
+                            //设置为打开
+                            LIGHT_FLAG = 0;
+                            cameraView.setFlash(CameraKit.Constants.FLASH_AUTO);
+                            mIm_light.setBackground(MMActiviry.this.getResources().getDrawable(
+                                    R.drawable.icon_light));
+                            break;
+                    }
                 }
             }
         });
 
-        //编辑内容
-        tv_abtain.setText(str_abtain);
-        tv_titile.setText(str_titileShow);
-        project_place.setText(str_place);
-        tv_projectName.setText(str_projectname);
-        tv_content.setText(str_content);
-        project_time.setText(str_time);
-        //设置颜色深度 //设置背景色
-        setTitleBackgroundColor();
-        //设置字体颜色
-        setTitleColor();
-        //设置字体大小
-        setFrontSize();
-        //水印开关
-        if (b_watermark_switch) {
-            ll_titile_background.setVisibility(View.VISIBLE);
-        } else {
-            ll_titile_background.setVisibility(View.INVISIBLE);
-        }
-        //标题是否显示
-        if (b_titileShow_switch) {
-            tv_titile.setVisibility(View.VISIBLE);
-        } else {
-            tv_titile.setVisibility(View.GONE);
-        }
-        //施工单位开关
-        if (b_place_switch) {
-            ll_place.setVisibility(View.VISIBLE);
-        } else {
-            ll_place.setVisibility(View.GONE);
-        }
-        //取证单位
-        if (b_abtain_switch) {
-            ll_abtain.setVisibility(View.VISIBLE);
-        } else {
-            ll_abtain.setVisibility(View.GONE);
-        }
-        //项目名称开关
-        if (b_projectname_switch) {
-            ll_project_name.setVisibility(View.VISIBLE);
-        } else {
-            ll_project_name.setVisibility(View.GONE);
-        }
-        //位置信息开关
-        if (b_add_switch) {
-            ll_add.setVisibility(View.VISIBLE);
-        } else {
-            ll_add.setVisibility(View.GONE);
-        }
-        //作业内容开关
-        if (b_content) {
-            ll_content.setVisibility(View.VISIBLE);
-        } else {
-            ll_content.setVisibility(View.GONE);
-        }
-        //当前日期开关
-        if (b_time_switch) {
-            ll_time.setVisibility(View.VISIBLE);
-        } else {
-            ll_time.setVisibility(View.GONE);
-        }
-        //经纬度数开关
-        if (b_longitude_switch) {
-            ll_logitude.setVisibility(View.VISIBLE);
-        } else {
-            ll_logitude.setVisibility(View.GONE);
-        }
-        //天气状况开关
-        if (b_weather_switch) {
-            ll_weather.setVisibility(View.VISIBLE);
-        } else {
-            ll_weather.setVisibility(View.GONE);
-        }
-        if (b_custom_switch) {
-            tv_custom.setVisibility(View.VISIBLE);
-        } else {
-            tv_custom.setVisibility(View.GONE);
-        }
-
-            EsayPermissions.with(this)
-                    .constantRequest() //可设置被拒绝后继续申请，直到用户授权或者永久拒绝
+        EsayPermissions.with(this)
+                .constantRequest() //可设置被拒绝后继续申请，直到用户授权或者永久拒绝
 //                .permission(Permission.SYSTEM_ALERT_WINDOW, Permission.REQUEST_INSTALL_PACKAGES) //支持请求6.0悬浮窗权限8.0请求安装权限
-                    .permission(Permission.WRITE_EXTERNAL_STORAGE, Permission.CAMERA, Permission.RECORD_AUDIO)
-                    .request(new OnPermission() {
-                        @Override
-                        public void hasPermission(List<String> granted, boolean isAll) {
-                            if (isAll) {
-                                Toast.makeText(MMActiviry.this, "获取权限成功", Toast.LENGTH_LONG).show();
-//                                startActivity(new Intent(MMActiviry.this, TestActivity.class));
-                            } else {
-                                Toast.makeText(MMActiviry.this, "取权限成功，部分权限未正常授予", Toast.LENGTH_LONG).show();
-                            }
+                .permission(Permission.WRITE_EXTERNAL_STORAGE, Permission.CAMERA)
+                .request(new OnPermission() {
+                    @Override
+                    public void hasPermission(List<String> granted, boolean isAll) {
+                        if (isAll) {
+                            Toast.makeText(MMActiviry.this, "获取权限成功", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(MMActiviry.this, "取权限成功，部分权限未正常授予", Toast.LENGTH_LONG).show();
                         }
+                    }
 
-                        @Override
-                        public void noPermission(List<String> denied, boolean quick) {
-                            if (quick) {
-                                Toast.makeText(MMActiviry.this, "被永久拒绝授权，请手动授予权限", Toast.LENGTH_LONG).show();
-                                //如果是被永久拒绝就跳转到应用权限系统设置页面
-                                EsayPermissions.gotoPermissionSettings(MMActiviry.this);
-                            } else {
-                                Toast.makeText(MMActiviry.this, "获取权限失败", Toast.LENGTH_LONG).show();
-                            }
+                    @Override
+                    public void noPermission(List<String> denied, boolean quick) {
+                        if (quick) {
+                            Toast.makeText(MMActiviry.this, "被永久拒绝授权，请手动授予权限", Toast.LENGTH_LONG).show();
+                            //如果是被永久拒绝就跳转到应用权限系统设置页面
+                            EsayPermissions.gotoPermissionSettings(MMActiviry.this);
+                        } else {
+                            Toast.makeText(MMActiviry.this, "获取权限失败", Toast.LENGTH_LONG).show();
                         }
-                    });
+                    }
+                });
 
         setCaptureLisenter(this);
+        //友盟推送
+        PushAgent.getInstance(this).onAppStart();
+        mLl_takened = findViewById(R.id.rl_bottom);
+        WindowManager wm = this.getWindowManager();
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        mHeight = getResources().getDimensionPixelSize(resourceId);
+        //        Display display = wm.getDefaultDisplay() ;
+//        int height = display.getHeight();
+        screenWidth = wm.getDefaultDisplay().getWidth();
+        screenHeight = wm.getDefaultDisplay().getHeight();
+        cameraHeight = (screenWidth / RAIO_WIDTH)*RAIO_HEIGHT;
+        double raio = screenHeight / screenWidth;
+        RelativeLayout.LayoutParams layoutParams;
+        if (raio > 2.0) {
+            // 移动相机
+            layoutParams = (RelativeLayout.LayoutParams) cameraView.getLayoutParams();
+            layoutParams.height = (int) cameraHeight;
+            temp_offbottom = (int) (getResources().getDimension(R.dimen.px_160)) / 2;
+            layoutParams.bottomMargin = (int) temp_offbottom;
+//            cameraView.setLayoutParams(layoutParams);
+            // 移动底部拍照布局
+            RelativeLayout.LayoutParams layoutParams1 = (RelativeLayout.LayoutParams) mLl_takened.getLayoutParams();
+            temp_offbottom += (int) ((getResources().getDimension(R.dimen.px_200)) / 2);
+            layoutParams1.bottomMargin = (int) ((getResources().getDimension(R.dimen.px_200)) / 2);
+//            mLl_takened.setLayoutParams(layoutParams1);
+        } else if (raio > 1.9) {
+            // 移动相机
+            layoutParams = (RelativeLayout.LayoutParams) cameraView.getLayoutParams();
+            layoutParams.height = (int) cameraHeight;
+            temp_offbottom = (int) (getResources().getDimension(R.dimen.px_150)) / 2;
+            layoutParams.bottomMargin = (int) temp_offbottom;
+//            cameraView.setLayoutParams(layoutParams);
+            // 移动底部拍照布局
+            RelativeLayout.LayoutParams layoutParams1 =
+                    (RelativeLayout.LayoutParams) mLl_takened.getLayoutParams();
+            temp_offbottom += (int) (getResources().getDimension(R.dimen.px_150)) / 2;
+            layoutParams1.bottomMargin = (int) (getResources().getDimension(R.dimen.px_150)) / 2;
+//            mLl_takened.setLayoutParams(layoutParams1);
+        } else if (raio > 1.8) {
+            // 移动相机
+            layoutParams = (RelativeLayout.LayoutParams) cameraView.getLayoutParams();
+            layoutParams.height = (int) cameraHeight;
+            temp_offbottom = (int) (getResources().getDimension(R.dimen.px_100)) / 2;
+            layoutParams.bottomMargin = (int) temp_offbottom;
+//            cameraView.setLayoutParams(layoutParams);
+            // 移动底部拍照布局
+            RelativeLayout.LayoutParams layoutParams1 =
+                    (RelativeLayout.LayoutParams) mLl_takened.getLayoutParams();
+            layoutParams1.bottomMargin = (int) (getResources().getDimension(R.dimen.px_100)) / 2;
+            temp_offbottom += (int) (getResources().getDimension(R.dimen.px_100)) / 2;
+//            mLl_takened.setLayoutParams(layoutParams1);
+        }
+//        ViewGroup.LayoutParams lp = cameraView.getLayoutParams();
+//        lp.height= (int) cameraHeight;
+//        cameraView.setLayoutParams(lp);
+        //不添加华为手机百度地图获取不到数据
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            //请求权限
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_CODE);
+        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        // -----------location config ------------
         locationService = ((DemoApplication) getApplication()).locationService;
         //获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity
         // ，都是通过此种方式获取locationservice实例的
@@ -469,12 +476,27 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
 //            locationService.setLocationOption(locationService.getDefaultLocationClientOption());
 //        } else if (type == 1) {
         locationService.start();
+//        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        cameraView.start();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            cameraView.start();
+        } else if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.CAMERA)) {
+            /*ConfirmationDialogFragment
+                    .newInstance(R.string.camera_permission_confirmation,
+                            new String[]{Manifest.permission.CAMERA},
+                            REQUEST_CAMERA_PERMISSION,
+                            R.string.camera_permission_not_granted)
+                    .show(getSupportFragmentManager(), FRAGMENT_DIALOG);*/
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
+                    REQUEST_CAMERA_PERMISSION);
+        }
     }
 
     @Override
@@ -485,9 +507,10 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
 
     @Override
     protected void onStop() {
-        super.onStop();
+
         locationService.unregisterListener(mListener); //注销掉监听
         locationService.stop(); //停止定位服务
+        super.onStop();
     }
 
     @Override
@@ -565,9 +588,6 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
                 str_latitude = location.getLatitude() + "";
                 sb.append(location.getLatitude());
                 sb.append("\nlongtitude : ");// 经度
-                str_longitude = location.getLongitude() + "";
-                str_longitude_latitude = str_longitude + "/" + str_latitude;
-                project_logitude_latitude.setText(str_longitude_latitude);
                 sb.append(location.getLongitude());
                 sb.append("\nradius : ");// 半径
                 sb.append(location.getRadius());
@@ -589,10 +609,14 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
                 sb.append(location.getTown());
                 sb.append("\nStreet : ");// 街道
                 sb.append(location.getStreet());
+                sb.append(location.getStreet());
                 sb.append("\naddr : ");// 地址信息
                 str_location = location.getAddrStr();
                 if (!isSaved) {
                     tv_projectAdd.setText(location.getAddrStr());
+                    str_longitude = location.getLongitude() + "";
+                    str_longitude_latitude = str_longitude + "/" + str_latitude;
+                    project_logitude_latitude.setText(str_longitude_latitude);
                 }
                 sb.append(location.getAddrStr());
                 sb.append("\nStreetNumber : ");// 获取街道号码
@@ -690,10 +714,14 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
             super.onConnectHotSpotMessage(s, i);
         }
     };
+//    float canvasTextSize1 = 42;
+//    float canvasTextSize2 = 44;
+//    float canvasTextSize3 = 46;
+//    float canvasTextSize4 = 48;
     float canvasTextSize1 = 42;
-    float canvasTextSize2 = 44;
-    float canvasTextSize3 = 46;
-    float canvasTextSize4 = 48;
+    float canvasTextSize2 = 50;
+    float canvasTextSize3 = 58;
+    float canvasTextSize4 = 66;
     private CaptureListener captureLisenter;        //按钮回调接口
     private View.OnClickListener photoOnClickListener = new View.OnClickListener() {
         @Override
@@ -725,7 +753,7 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
             fos = new FileOutputStream(file);
             final FileOutputStream finalFos = fos;
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, finalFos);
-            Toast.makeText(this, "已保存....", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "已保存", Toast.LENGTH_SHORT).show();
             fos.flush();
             //通知系统相册刷新
             sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
@@ -947,13 +975,22 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
 
     private void specificFrontSize(float dimension) {
         project_weather.setTextSize(dimension);
-        tv_abtain.setTextSize(dimension);
-        tv_content.setTextSize(dimension);
+        project_time.setTextSize(dimension);
+
+        tv_fixed_add.setTextSize(dimension);
+        jtv_weather.setTextSize(dimension);
         project_logitude_latitude.setTextSize(dimension);
+        jtv_logitude.setTextSize(dimension);
+        jtv_time.setTextSize(dimension);
+        tv_content.setTextSize(dimension);
+        jtv_content.setTextSize(dimension);
+        jtv_projectName.setTextSize(dimension);
+        tv_abtain.setTextSize(dimension);
+        jtv_abtain.setTextSize(dimension);
+        jtv_place.setTextSize(dimension);
         tv_projectAdd.setTextSize(dimension);
         tv_projectName.setTextSize(dimension);
         project_place.setTextSize(dimension);
-        project_time.setTextSize(dimension);
     }
 
     private void setTitleBackgroundColor() {
@@ -1082,6 +1119,12 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
     }
 
     private void iniData() {
+//        ViewGroup.LayoutParams lp;
+//        lp= cameraView.getLayoutParams();
+//        lp.height= (int) getResources().getDimension(R.dimen.px_500);
+//        cameraView.setLayoutParams(lp);
+
+
         //编辑内容
         tv_abtain.setText(str_abtain);
         tv_titile.setText(str_titileShow);
@@ -1222,17 +1265,33 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onImage(CameraKitImage cameraKitImage) {
+        // 播放拍照声音
+        if (cameraView != null) {
+            if (b_voice_switch) {
+                sp.play(music, 1, 1, 0, 0, 1);
+            }
+        }
         Bitmap bitmap;
         if (cameraView.isFacingFront()) {
             bitmap = CommonUtil.loadBitmap(cameraKitImage.getJpeg());
         } else {
             bitmap = cameraKitImage.getBitmap();
         }
-        //imageView.setImageBitmap(bitmap);
+
+
+
+        //拍照原图为全屏的照片，对照片进行4:3的比例裁剪
+        double temp_bottom = ((screenHeight - cameraHeight) + temp_offbottom) / 2;
+        int initCropHeight = (int) ((screenHeight - cameraHeight) - temp_bottom);
+        bitmap = cropBitmap(bitmap,initCropHeight+mHeight*2);
+
+//        imageView.setImageBitmap(bitmap);
+
         final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(front_color);
         float bitmapWidth = bitmap.getWidth();
         float bitmapHeight = bitmap.getHeight();
+
         float ratio = getPxRatio(bitmapWidth, bitmapHeight);
         switch (front_size) {
             case 0:
@@ -1277,7 +1336,7 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
         if (!b_watermark_switch) {
             list_keyword.clear();
         }
-        if (bitmapWidth>bitmapHeight) {
+        if (bitmapWidth>bitmapHeight) {//只竖屏拍照
             bitmap = imageUtil.createDegree(bitmap, 90);
         }
         float paddingBottom = 150 * getPxRatio(bitmap.getWidth(), bitmap.getHeight());
@@ -1297,5 +1356,15 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
 
 
 
+    /**
+     * 裁剪
+     *
+     * @param bitmap 原图
+     * @return 裁剪后的图像
+     */
+    private Bitmap cropBitmap(Bitmap bitmap,int initCropHeirht) {
+        int bitmapWidth = bitmap.getWidth();
+        return Bitmap.createBitmap(bitmap,0, initCropHeirht, bitmapWidth, (bitmapWidth/3)*4, null, false);
+    }
 }
 

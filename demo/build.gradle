@@ -24,7 +24,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 3
-        versionName '1.0.2'
+        versionName '1.0.3'
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
         vectorDrawables.useSupportLibrary = true
         //bugly的配置
@@ -155,7 +155,8 @@ dependencies {
     implementation ('com.github.niorgai:StatusBarCompat:2.1.4', {
         exclude group: 'com.android.support'
     })
-
+    //状态栏颜色修改库，配带兼容
+    compile 'com.githang:status-bar-compat:0.3'
     //相机库
     implementation project(path: ':library')
 }

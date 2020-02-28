@@ -254,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (isMIUI()) {
+      /*  if (isMIUI()) {
             isXiMi = true;
             Log.d(TAG, "onCreate: 是小米");
             Intent intent = new Intent(MainActivity.this, MMActiviry.class);
@@ -264,7 +264,7 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             isXiMi = false;
             Log.d(TAG, "onCreate: 不是 小米");
-        }
+        }*/
 
         WindowManager wm = this.getWindowManager();
         double width = wm.getDefaultDisplay().getWidth();
@@ -1053,7 +1053,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        // getLocation();
         // -----------location config ------------
         locationService = ((DemoApplication) getApplication()).locationService;
         //获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity

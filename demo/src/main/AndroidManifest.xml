@@ -57,20 +57,21 @@
 
         <activity android:name=".ui.activity.MMActiviry"
             android:screenOrientation="portrait">
-        <!--    <intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
+            </intent-filter>
         </activity>
 
-        <activity
+       <!-- <activity
             android:name=".ui.activity.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity>-->
+
         <!-- bugly -->
         <provider
             android:name="android.support.v4.content.FileProvider"

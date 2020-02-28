@@ -5,11 +5,12 @@
     android:id="@+id/activityMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryReallyDark">
+    android:background="@android:color/black">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@android:color/black"
         android:orientation="vertical">
 
         <android.support.v7.widget.Toolbar
@@ -24,10 +25,6 @@
             app:logo="@drawable/logomark_light"
             app:title="CameraKit App" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
          <!--   <com.camerakit.CameraKitView
                 android:id="@+id/camera"
                 android:layout_width="match_parent"
@@ -38,18 +35,7 @@
                 app:camera_imageJpegQuality="100"
                 app:camera_imageMegaPixels="2.0"
                 app:camera_permissions="camera" />-->
-            <com.wonderkiln.camerakit.CameraView
-                xmlns:camerakit="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/camera"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:adjustViewBounds="true"
-                camerakit:ckCropOutput="false"
-                camerakit:ckFlash="off"
-                camerakit:ckFocus="tap"
-                camerakit:ckJpegQuality="100"
-                camerakit:ckMethod="standard"
-                camerakit:ckPermissions="strict" />
+
          <!--   <Button
                 android:id="@+id/permissionsButton1"
                 android:layout_width="wrap_content"
@@ -58,7 +44,7 @@
                 android:text="Approve Permissions"
                 android:visibility="gone" />-->
 
-            <ImageView
+         <!--   <ImageView
                 android:id="@+id/imageView1"
                 android:layout_width="108dp"
                 android:layout_height="192dp"
@@ -67,70 +53,39 @@
                 android:alpha="1.0"
                 android:visibility="gone"
                 android:background="@color/badge_color"
-                android:scaleType="centerInside" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/facingText1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:shadowColor="#333333"
-                    android:shadowDx="1"
-                    android:shadowDy="1"
-                    android:shadowRadius="3"
-                    android:singleLine="true"
-                    android:textColor="#FFFFFF"
-                    android:textSize="11dp" />
-
-                <TextView
-                    android:id="@+id/flashText1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:shadowColor="#333333"
-                    android:shadowDx="1"
-                    android:shadowDy="1"
-                    android:shadowRadius="3"
-                    android:singleLine="true"
-                    android:textColor="#FFFFFF"
-                    android:textSize="11dp" />
-
-                <TextView
-                    android:id="@+id/previewSizeText1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:shadowColor="#333333"
-                    android:shadowDx="1"
-                    android:shadowDy="1"
-                    android:shadowRadius="3"
-                    android:singleLine="true"
-                    android:textColor="#FFFFFF"
-                    android:textSize="11dp" />
-
-                <TextView
-                    android:id="@+id/photoSizeText1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:shadowColor="#333333"
-                    android:shadowDx="1"
-                    android:shadowDy="1"
-                    android:shadowRadius="3"
-                    android:singleLine="true"
-                    android:textColor="#FFFFFF"
-                    android:textSize="11dp" />
-
-            </LinearLayout>
-
-        </FrameLayout>
+                android:scaleType="centerInside" />-->
 
     </LinearLayout>
 
+
+
+
+    <com.wonderkiln.camerakit.CameraView
+        xmlns:camerakit="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/camera"
+        android:background="@android:color/white"
+        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        android:minHeight="@dimen/px_500"
+        android:adjustViewBounds="true"
+        camerakit:ckCropOutput="false"
+        camerakit:ckFlash="off"
+        camerakit:ckFocus="tap"
+        camerakit:ckJpegQuality="100"
+        camerakit:ckMethod="standard"
+        camerakit:ckPermissions="strict"
+        android:layout_height="wrap_content" />
+
+    <View
+        android:background="@android:color/black"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_height="@dimen/px_100">
+    </View>
+
     <RelativeLayout
         android:id="@+id/rl_bottom"
+        android:background="@android:color/black"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -229,7 +184,7 @@
 
     <RelativeLayout
         android:id="@+id/rl_title"
-        android:layout_marginTop="@dimen/px_50"
+        android:layout_above="@id/camera"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <ImageView
@@ -278,6 +233,7 @@
 
     <LinearLayout
         android:id="@+id/ll_titile_background"
+        android:layout_alignBottom="@id/camera"
         android:orientation="vertical"
         android:layout_marginLeft="6dp"
         android:layout_width="300dp"
@@ -307,7 +263,7 @@
                 android:text="@string/jtv_place"
                 android:textSize="@dimen/px_text_18"
                 android:textColor="#ffffff"
-                android:layout_width="@dimen/px_180"
+                android:layout_width="@dimen/px_170"
                 android:layout_height="wrap_content" />
 
             <TextView
@@ -329,7 +285,7 @@
                 android:text="@string/jtv_abtain"
                 android:textSize="@dimen/px_text_18"
                 android:textColor="#ffffff"
-                android:layout_width="@dimen/px_180"
+                android:layout_width="@dimen/px_170"
                 android:layout_height="wrap_content" />
 
             <TextView
@@ -351,7 +307,7 @@
                 android:text="@string/jtv_project_name"
                 android:textSize="@dimen/px_text_18"
                 android:textColor="#ffffff"
-                android:layout_width="@dimen/px_180"
+                android:layout_width="@dimen/px_170"
                 android:layout_height="wrap_content" />
 
             <TextView
@@ -373,7 +329,7 @@
                 android:text="@string/jtv_address"
                 android:textSize="@dimen/px_text_18"
                 android:textColor="#ffffff"
-                android:layout_width="@dimen/px_180"
+                android:layout_width="@dimen/px_170"
                 android:layout_height="wrap_content" />
 
             <TextView
@@ -396,7 +352,7 @@
                 android:text="@string/str_content"
                 android:textSize="@dimen/px_text_18"
                 android:textColor="#ffffff"
-                android:layout_width="@dimen/px_180"
+                android:layout_width="@dimen/px_170"
                 android:layout_height="wrap_content" />
 
             <TextView
@@ -418,7 +374,7 @@
                 android:textSize="@dimen/px_text_18"
                 android:textColor="#ffffff"
                 android:text="@string/jtv_time"
-                android:layout_width="@dimen/px_180"
+                android:layout_width="@dimen/px_170"
                 android:layout_height="wrap_content" />
 
             <TextView
@@ -440,7 +396,7 @@
                 android:text="@string/jtv_logitude_latitude"
                 android:textSize="@dimen/px_text_18"
                 android:textColor="#ffffff"
-                android:layout_width="@dimen/px_180"
+                android:layout_width="@dimen/px_170"
                 android:layout_height="wrap_content" />
 
             <TextView
@@ -462,7 +418,7 @@
                 android:text="@string/jtv_weather"
                 android:textSize="@dimen/px_text_18"
                 android:textColor="#ffffff"
-                android:layout_width="@dimen/px_180"
+                android:layout_width="@dimen/px_170"
                 android:layout_height="wrap_content" />
 
             <TextView
@@ -481,5 +437,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="@dimen/px_500"
+        android:layout_height="@dimen/px_500">
+    </ImageView>
 
 </RelativeLayout>
