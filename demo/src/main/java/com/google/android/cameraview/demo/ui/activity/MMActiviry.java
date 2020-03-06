@@ -41,6 +41,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -192,6 +193,8 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
     double cameraHeight;
     double temp_offbottom;
     private int mHeight;
+    String sj_xinghao;//手机型号
+    String sj_changshang;//手机型号
 
     public static boolean isOppo() {
         String manufacturer = Build.MANUFACTURER;
@@ -217,6 +220,17 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
         cameraView.setFacing(CameraKit.Constants.FACING_BACK);
         cameraView.addCameraKitListener(this);
 
+        /**
+         * 获取手机型号
+         */
+        sj_xinghao = android.os.Build.MODEL;
+
+        /**
+         * 获取手机厂商
+         */
+         sj_changshang = android.os.Build.BRAND;
+         TextView textView = findViewById(R.id.textview);
+
 //        ViewGroup.LayoutParams lp1;
 //        lp1= cameraView.getLayoutParams();
 //        lp1.height= (int) getResources().getDimension(R.dimen.px_900);
@@ -227,10 +241,10 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
         toolbar.setOnMenuItemClickListener(this);
         photoButton = findViewById(R.id.photoButton);
         photoButton.setOnClickListener(photoOnClickListener);
-        flashOnButton = findViewById(R.id.flashOnButton);
-        flashOffButton = findViewById(R.id.flashOffButton);
-        facingFrontButton = findViewById(R.id.facingFrontButton);
-        facingBackButton = findViewById(R.id.facingBackButton);
+//        flashOnButton = findViewById(R.id.flashOnButton);
+//        flashOffButton = findViewById(R.id.flashOffButton);
+//        facingFrontButton = findViewById(R.id.facingFrontButton);
+//        facingBackButton = findViewById(R.id.facingBackButton);
 //        permissionsButton = findViewById(R.id.permissionsButton1);
         project_place = findViewById(R.id.project_place);
         project_time = findViewById(R.id.project_time);
@@ -414,7 +428,7 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
             layoutParams.height = (int) cameraHeight;
             temp_offbottom = (int) (getResources().getDimension(R.dimen.px_160)) / 2;
             layoutParams.bottomMargin = (int) temp_offbottom;
-//            cameraView.setLayoutParams(layoutParams);
+            cameraView.setLayoutParams(layoutParams);
             // 移动底部拍照布局
             RelativeLayout.LayoutParams layoutParams1 = (RelativeLayout.LayoutParams) mLl_takened.getLayoutParams();
             temp_offbottom += (int) ((getResources().getDimension(R.dimen.px_200)) / 2);
@@ -426,7 +440,7 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
             layoutParams.height = (int) cameraHeight;
             temp_offbottom = (int) (getResources().getDimension(R.dimen.px_150)) / 2;
             layoutParams.bottomMargin = (int) temp_offbottom;
-//            cameraView.setLayoutParams(layoutParams);
+            cameraView.setLayoutParams(layoutParams);
             // 移动底部拍照布局
             RelativeLayout.LayoutParams layoutParams1 =
                     (RelativeLayout.LayoutParams) mLl_takened.getLayoutParams();
@@ -439,7 +453,7 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
             layoutParams.height = (int) cameraHeight;
             temp_offbottom = (int) (getResources().getDimension(R.dimen.px_100)) / 2;
             layoutParams.bottomMargin = (int) temp_offbottom;
-//            cameraView.setLayoutParams(layoutParams);
+            cameraView.setLayoutParams(layoutParams);
             // 移动底部拍照布局
             RelativeLayout.LayoutParams layoutParams1 =
                     (RelativeLayout.LayoutParams) mLl_takened.getLayoutParams();
@@ -447,9 +461,9 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
             temp_offbottom += (int) (getResources().getDimension(R.dimen.px_100)) / 2;
 //            mLl_takened.setLayoutParams(layoutParams1);
         }
-//        ViewGroup.LayoutParams lp = cameraView.getLayoutParams();
-//        lp.height= (int) cameraHeight;
-//        cameraView.setLayoutParams(lp);
+        ViewGroup.LayoutParams lp = cameraView.getLayoutParams();
+        lp.height= (int) cameraHeight;
+        cameraView.setLayoutParams(lp);
         //不添加华为手机百度地图获取不到数据
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
@@ -931,8 +945,26 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
     }
 
     private void setFrontSize() {
-
-        if (isOppo()){
+        if (sj_xinghao.equals("PBAM00") ){//OPPOA5的是手机型号是PBAM00字体很小不知道是为啥，单独处理
+            switch (front_size) {
+                case 0:
+                    float dimension = getResources().getDimension(R.dimen.px_text_10);
+                    specificFrontSize(dimension);
+                    break;
+                case 1:
+                    float dimension1 = getResources().getDimension(R.dimen.px_text_11);
+                    specificFrontSize(dimension1);
+                    break;
+                case 2:
+                    float dimension2 = getResources().getDimension(R.dimen.px_text_12);
+                    specificFrontSize(dimension2);
+                    break;
+                case 3:
+                    float dimension3 = getResources().getDimension(R.dimen.px_text_14);
+                    specificFrontSize(dimension3);
+                    break;
+            }
+        }else if (isOppo()){
             switch (front_size) {
                 case 0:
                     float dimension = getResources().getDimension(R.dimen.px_text_4);
@@ -1364,7 +1396,8 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
      */
     private Bitmap cropBitmap(Bitmap bitmap,int initCropHeirht) {
         int bitmapWidth = bitmap.getWidth();
-        return Bitmap.createBitmap(bitmap,0, initCropHeirht, bitmapWidth, (bitmapWidth/3)*4, null, false);
+        return Bitmap.createBitmap(bitmap,0, initCropHeirht, bitmapWidth,
+                (int) ((bitmapWidth/RAIO_WIDTH)*RAIO_HEIGHT), null, false);
     }
 }
 

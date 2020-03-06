@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black">
-
+<!--192837-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -90,7 +90,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom|center_horizontal"
-        android:layout_margin="12dp">
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp">
 <!--        android:background="@drawable/ic_gallery"-->
         <ImageView
             android:id="@+id/main_menu_gallery1"
@@ -112,7 +113,7 @@
             android:layout_width="@dimen/px_70"
             android:layout_marginEnd="@dimen/px_50" />
 
-        <LinearLayout
+        <!--<LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left|bottom"
@@ -138,7 +139,7 @@
                 android:padding="14dp"
                 android:text=" Facing:\nBack" />
 
-        </LinearLayout>
+        </LinearLayout>-->
 
         <Button
             android:id="@+id/photoButton"
@@ -151,7 +152,7 @@
             android:background="@drawable/icon_tokened"
             />
 
-        <LinearLayout
+        <!--<LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right|bottom"
@@ -177,7 +178,7 @@
                 android:padding="14dp"
                 android:text=" Flash:\nOff" />
 
-        </LinearLayout>
+        </LinearLayout>-->
 
     </RelativeLayout>
 
@@ -443,5 +444,17 @@
         android:layout_width="@dimen/px_500"
         android:layout_height="@dimen/px_500">
     </ImageView>
+
+
+    <TextView
+        android:id="@+id/textview"
+        android:textColor="@color/colorAccent"
+        android:textSize="40sp"
+        android:text="aaa"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+    </TextView>
 
 </RelativeLayout>
