@@ -23,7 +23,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".ui.activity.SetUpActivity"
+    tools:context="com.yuchang.camera.ui.activity.SetUpActivity"
     tools:showIn="@layout/activity_set_up">
 
     <LinearLayout
@@ -150,6 +150,8 @@
                 android:layout_weight="1"
                 android:textColor="#ffffff"
                 android:layout_marginLeft="@dimen/px_15"
+                android:hint="请填写施工单位"
+                android:textColorHint="@color/gray_color"
                 />
 
             <Switch
@@ -198,6 +200,8 @@
                 android:layout_marginLeft="@dimen/px_15"
                 android:textColor="#ffffff"
                 android:layout_weight="1"
+                android:hint="请填写取证单位"
+                android:textColorHint="@color/gray_color"
                 />
 
             <Switch
@@ -226,7 +230,7 @@
             android:layout_height="wrap_content"
             tools:ignore="MissingConstraints">
             <TextView
-                android:text="显示标题"
+                android:text="作业内容"
                 android:layout_marginBottom="20dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginLeft="10dp"
@@ -243,6 +247,8 @@
                 android:layout_marginTop="20dp"
                 android:textColor="#ffffff"
                 android:layout_weight="1"
+                android:hint="请填写作业内容"
+                android:textColorHint="@color/gray_color"
                 android:layout_marginLeft="@dimen/px_15"
                 />
             <Switch
@@ -286,6 +292,8 @@
                 android:textColor="#ffffff"
                 android:layout_weight="1"
                 android:layout_marginLeft="@dimen/px_15"
+                android:hint="请填写项目名称"
+                android:textColorHint="@color/gray_color"
                 />
             <Switch
                 android:id="@+id/sh_watermark_projectname"
@@ -325,6 +333,8 @@
                 android:textColor="#ffffff"
                 android:layout_weight="1"
                 android:layout_marginLeft="@dimen/px_15"
+                android:hint="请填写位置信息"
+                android:textColorHint="@color/gray_color"
                 />
             <Switch
                 android:layout_marginRight="10dp"
@@ -349,7 +359,7 @@
             android:layout_height="wrap_content"
             tools:ignore="MissingConstraints">
             <TextView
-                android:text="作业内容"
+                android:text="备注内容"
                 android:layout_marginBottom="20dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginLeft="10dp"
@@ -365,6 +375,8 @@
                 android:layout_marginTop="20dp"
                 android:textColor="#ffffff"
                 android:layout_marginLeft="@dimen/px_15"
+                android:hint="请填写备注内容"
+                android:textColorHint="@color/gray_color"
                 android:layout_weight="1"/>
             <Switch
                 android:id="@+id/sh_content"
@@ -403,6 +415,8 @@
                 android:layout_marginTop="20dp"
                 android:layout_weight="1"
                 android:layout_marginLeft="@dimen/px_15"
+                android:hint="请填写日期"
+                android:textColorHint="@color/gray_color"
                 android:textColor="#ffffff"/>
             <Switch
                 android:id="@+id/sh_watermark_projecttime"
@@ -443,6 +457,8 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginLeft="@dimen/px_15"
                 android:textColor="#ffffff"
+                android:hint="请填写经纬度"
+                android:textColorHint="@color/gray_color"
                 android:layout_weight="1"/>
             <Switch
                 android:id="@+id/sh_watermark_longitude"
@@ -545,6 +561,8 @@
                 android:layout_marginTop="20dp"
                 android:textColor="#ffffff"
                 android:layout_marginLeft="@dimen/px_15"
+                android:hint="请填写天气"
+                android:textColorHint="@color/gray_color"
                 android:layout_weight="1"/>
             <Switch
                 android:layout_marginRight="10dp"
@@ -857,7 +875,7 @@
                 android:textColor="#ffffff"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
-            <com.google.android.cameraview.demo.FontsizeRaeSeekBar
+            <com.yuchang.camera.FontsizeRaeSeekBar
                 android:id="@+id/seekBar_fontsize"
                 android:layout_marginBottom="20dp"
                 android:layout_marginTop="10dp"
@@ -887,7 +905,7 @@
                 android:textColor="#ffffff"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
-            <com.google.android.cameraview.demo.BackgoundcolorSeekBar
+            <com.yuchang.camera.BackgoundcolorSeekBar
                 android:id="@+id/seekBar_backgroundcolor"
                 android:layout_marginBottom="20dp"
                 android:layout_marginTop="10dp"

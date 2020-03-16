@@ -36,7 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.google.android.cameraview.demo.JustifyTextView
+        <com.yuchang.camera.JustifyTextView
             android:id="@+id/jtv_place"
             android:text="@string/jtv_place"
             android:textSize="@dimen/px_text_24"
@@ -58,7 +58,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.google.android.cameraview.demo.JustifyTextView
+        <com.yuchang.camera.JustifyTextView
             android:id="@+id/jtv_abtain"
             android:text="@string/jtv_abtain"
             android:textSize="@dimen/px_text_24"
@@ -80,7 +80,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.google.android.cameraview.demo.JustifyTextView
+        <com.yuchang.camera.JustifyTextView
             android:id="@+id/jtv_projectName"
             android:text="@string/jtv_project_name"
             android:textSize="@dimen/px_text_24"
@@ -102,7 +102,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.google.android.cameraview.demo.JustifyTextView
+        <com.yuchang.camera.JustifyTextView
             android:id="@+id/tv_fixed_add"
             android:text="@string/jtv_address"
             android:textSize="@dimen/px_text_24"
@@ -125,7 +125,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.google.android.cameraview.demo.JustifyTextView
+        <com.yuchang.camera.JustifyTextView
             android:id="@+id/jtv_content"
             android:text="@string/str_content"
             android:textSize="@dimen/px_text_24"
@@ -147,7 +147,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <com.google.android.cameraview.demo.JustifyTextView
+        <com.yuchang.camera.JustifyTextView
             android:id="@+id/jtv_time"
             android:textSize="@dimen/px_text_24"
             android:textColor="#ffffff"
@@ -170,7 +170,7 @@
         android:orientation="horizontal"
         android:layout_height="wrap_content">
 
-        <com.google.android.cameraview.demo.JustifyTextView
+        <com.yuchang.camera.JustifyTextView
             android:id="@+id/jtv_logitude"
             android:text="@string/jtv_logitude_latitude"
             android:textSize="@dimen/px_text_24"
@@ -192,7 +192,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.google.android.cameraview.demo.JustifyTextView
+        <com.yuchang.camera.JustifyTextView
             android:id="@+id/jtv_weather"
             android:text="@string/jtv_weather"
             android:textSize="@dimen/px_text_24"

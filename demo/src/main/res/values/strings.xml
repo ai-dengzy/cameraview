@@ -42,7 +42,7 @@
     <string name="jtv_altitude">海拔：103.53米</string>
     <string name="fun_setting">功能设置</string>
     <string name="jtv_abtain">取证单位：</string>
-    <string name="str_content">作业内容：</string>
+    <string name="str_content">备注内容：</string>
     <string name="jtv_logitude_latitude">经纬度数：</string>
 
 </resources>
