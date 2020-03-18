@@ -34,7 +34,6 @@ import android.media.ThumbnailUtils;
 import android.util.Log;
 
 import com.yuchang.camera.R;
-import com.yuchang.camera.ui.activity.MainActivity;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

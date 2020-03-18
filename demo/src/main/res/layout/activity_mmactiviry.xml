@@ -241,6 +241,7 @@
         android:layout_above="@id/rl_bottom">
 
         <LinearLayout
+            android:id="@+id/ll_title"
             android:background="@color/them_color_green"
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -330,6 +331,8 @@
             <com.yuchang.camera.JustifyTextView
                 android:id="@+id/jtv_projectName"
                 android:text="@string/jtv_project_name"
+                android:layout_marginLeft="2dp"
+                android:layout_marginStart="2dp"
                 android:textSize="@dimen/px_text_18"
                 android:textColor="#ffffff"
                 android:layout_width="@dimen/px_170"

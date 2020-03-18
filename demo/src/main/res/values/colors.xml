@@ -108,4 +108,11 @@
     <color name="green_light">#ff99cc00</color>
     <color name="orange_light">#ffffbb33</color>
     <color name="blue_ligh">#ff33b5e5</color>
+
+    <!--隐私政策-->
+    <color name="colorWhite">#FFFFFFFF</color>
+    <color name="colorBlack">#FF000000</color>
+    <color name="colorGray">#878787</color>
+    <color name="colorOrange">#FFE26C25</color>
+    <color name="colorBlue">#FF036EB8</color>
 </resources>

@@ -40,7 +40,15 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,6 +83,7 @@ import com.wonderkiln.camerakit.CameraKitEventListener;
 import com.wonderkiln.camerakit.CameraKitImage;
 import com.wonderkiln.camerakit.CameraKitVideo;
 import com.wonderkiln.camerakit.CameraView;
+import com.yuchang.camera.view.PrivacyDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -118,6 +127,7 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
     //变量参数
+    private boolean isAgreePrivacy; // 是否同意隐私政策，第一次同意后，不再弹出对话框
     private boolean b_watermark_switch;
     private boolean b_weather_switch;
     private boolean b_longitude_switch;
@@ -182,6 +192,7 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
     TextView project_place;//施工单位内容
     TextView project_time;
     public static final int LOCATION_CODE = 301;
+    public static final int PERSSION_CODE = 319;
     private String mLocality = "";
     private Toast mToast;
     private List<String> list_keyword;
@@ -199,6 +210,8 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
     String sj_xinghao;//手机型号
     String sj_changshang;//手机型号
     boolean is_horizontion;
+    private LinearLayout mLinearLayout;
+
     public static boolean isOppo() {
         String manufacturer = Build.MANUFACTURER;
         //这个字符串可以自己定义,例如判断华为就填写huawei,魅族就填写meizu
@@ -244,6 +257,7 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
         toolbar.setOnMenuItemClickListener(this);
         photoButton = findViewById(R.id.photoButton);
         photoButton.setOnClickListener(photoOnClickListener);
+        mLinearLayout = findViewById(R.id.ll_title);
 //        flashOnButton = findViewById(R.id.flashOnButton);
 //        flashOffButton = findViewById(R.id.flashOffButton);
 //        facingFrontButton = findViewById(R.id.facingFrontButton);
@@ -290,6 +304,7 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
         music = sp.load(this, R.raw.takend, 1); //把你的声音素材放到res/raw里，第2个参数即为资源文件，第3个为音乐的优先级
         list_keyword = new ArrayList<String>();
         mSharedPreferences = getSharedPreferences("camera", MODE_PRIVATE);
+        isAgreePrivacy = mSharedPreferences.getBoolean("isAgreePrivacy", false);
         b_voice_switch = mSharedPreferences.getBoolean("sh_voice_switch", true);
         b_watermark_switch = mSharedPreferences.getBoolean("sh_watermark_switch", true);
         b_abtain_switch = mSharedPreferences.getBoolean("sh_abtain_switch", true);
@@ -386,32 +401,6 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
             }
         });
 
-        EsayPermissions.with(this)
-                .constantRequest() //可设置被拒绝后继续申请，直到用户授权或者永久拒绝
-//                .permission(Permission.SYSTEM_ALERT_WINDOW, Permission.REQUEST_INSTALL_PACKAGES) //支持请求6.0悬浮窗权限8.0请求安装权限
-                .permission(Permission.WRITE_EXTERNAL_STORAGE, Permission.CAMERA)
-                .request(new OnPermission() {
-                    @Override
-                    public void hasPermission(List<String> granted, boolean isAll) {
-                        if (isAll) {
-                            Toast.makeText(MMActiviry.this, "获取权限成功", Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(MMActiviry.this, "取权限成功，部分权限未正常授予", Toast.LENGTH_LONG).show();
-                        }
-                    }
-
-                    @Override
-                    public void noPermission(List<String> denied, boolean quick) {
-                        if (quick) {
-                            Toast.makeText(MMActiviry.this, "被永久拒绝授权，请手动授予权限", Toast.LENGTH_LONG).show();
-                            //如果是被永久拒绝就跳转到应用权限系统设置页面
-                            EsayPermissions.gotoPermissionSettings(MMActiviry.this);
-                        } else {
-                            Toast.makeText(MMActiviry.this, "获取权限失败", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-
         setCaptureLisenter(this);
         //友盟推送
 //        PushAgent.getInstance(this).onAppStart();
@@ -468,19 +457,50 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
         ViewGroup.LayoutParams lp = cameraView.getLayoutParams();
         lp.height= (int) cameraHeight;
         cameraView.setLayoutParams(lp);
+
+
+        /*EsayPermissions.with(this)
+                .constantRequest() //可设置被拒绝后继续申请，直到用户授权或者永久拒绝
+//                .permission(Permission.SYSTEM_ALERT_WINDOW, Permission.REQUEST_INSTALL_PACKAGES) //支持请求6.0悬浮窗权限8.0请求安装权限
+                .permission(Permission.WRITE_EXTERNAL_STORAGE, Permission.CAMERA,Permission.ACCESS_FINE_LOCATION,Permission.ACCESS_COARSE_LOCATION)
+                .request(new OnPermission() {
+                    @Override
+                    public void hasPermission(List<String> granted, boolean isAll) {
+                        if (isAll) {
+                            Toast.makeText(MMActiviry.this, "已获取相机权限", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(MMActiviry.this, "取权限成功，部分权限未正常授予", Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void noPermission(List<String> denied, boolean quick) {
+                        if (quick) {
+                            Toast.makeText(MMActiviry.this, "被永久拒绝授权，请手动授予权限", Toast.LENGTH_LONG).show();
+                            //如果是被永久拒绝就跳转到应用权限系统设置页面
+                            EsayPermissions.gotoPermissionSettings(MMActiviry.this);
+                        } else {
+                            Toast.makeText(MMActiviry.this, "获取权限失败", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });*/
         //不添加华为手机百度地图获取不到数据
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(this,
+      /*  if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED|| ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             //请求权限
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
                             Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_CODE);
-        }
+        }*/
 
         //部分手机拍照关闭声音后，还有声音。使用系统静音处理
         // getDoNotDisturb();
+
+        // 没有同意隐私政策
+        if (!isAgreePrivacy){
+            showPrivacy();
+        }
     }
 
     @Override
@@ -503,20 +523,20 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
     @Override
     public void onResume() {
         super.onResume();
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED) {
-            cameraView.start();
-        } else if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.CAMERA)) {
-            /*ConfirmationDialogFragment
-                    .newInstance(R.string.camera_permission_confirmation,
-                            new String[]{Manifest.permission.CAMERA},
-                            REQUEST_CAMERA_PERMISSION,
-                            R.string.camera_permission_not_granted)
-                    .show(getSupportFragmentManager(), FRAGMENT_DIALOG);*/
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
-                    REQUEST_CAMERA_PERMISSION);
+        if (isAgreePrivacy){
+            // 动态请求权限
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                    &&ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    &&ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    &&ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+            ) {
+                cameraView.start();
+            }  else {
+                //请求权限
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERSSION_CODE);
+            }
         }
     }
 
@@ -1202,9 +1222,9 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
         }
         //标题是否显示
         if (b_titileShow_switch) {
-            tv_titile.setVisibility(View.VISIBLE);
+            mLinearLayout.setVisibility(View.VISIBLE);
         } else {
-            tv_titile.setVisibility(View.GONE);
+            mLinearLayout.setVisibility(View.GONE);
         }
         //施工单位开关
         if (b_place_switch) {
@@ -1280,7 +1300,7 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
         cameraView.captureImage();
     }
 
-    @Override
+  /*  @Override
     public void recordShort(long time) {
 
     }
@@ -1303,7 +1323,7 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
     @Override
     public void recordError() {
 
-    }
+    }*/
 
     @Override
     public void onEvent(CameraKitEvent cameraKitEvent) {
@@ -1488,5 +1508,88 @@ public class MMActiviry extends AppCompatActivity implements Toolbar.OnMenuItemC
             startActivity(intent);
         }
     }
+
+    /**
+     * 显示用户协议和隐私政策
+     */
+    private void showPrivacy() {
+        final PrivacyDialog dialog = new PrivacyDialog(MMActiviry.this);
+        TextView tv_privacy_tips = dialog.findViewById(R.id.tv_privacy_tips);
+        TextView btn_exit = dialog.findViewById(R.id.btn_exit);
+        TextView btn_enter = dialog.findViewById(R.id.btn_enter);
+        dialog.show();
+        String string = getResources().getString(R.string.privacy_tips);
+        String key1 = getResources().getString(R.string.privacy_tips_key1);
+        int index1 = string.indexOf(key1);
+        //需要显示的字串
+        SpannableString spannedString = new SpannableString(string);
+        //设置点击字体颜色
+        ForegroundColorSpan colorSpan1 = new ForegroundColorSpan(getResources().getColor(R.color.colorBlue));
+        spannedString.setSpan(colorSpan1, index1, index1 + key1.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+        //设置点击字体大小
+        TextView tvTip = dialog.findViewById(R.id.tv_privacy_tips);
+//        AbsoluteSizeSpan sizeSpan1 = new AbsoluteSizeSpan(, true);
+        spannedString.setSpan(null, index1, index1 + key1.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+        //设置点击事件
+        ClickableSpan clickableSpan1 = new ClickableSpan() {
+            @Override
+            public void onClick(View view) {
+                //打开隐私政策网址
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://ycdlfw.com/userAgreement/")));
+            }
+
+            @Override
+            public void updateDrawState(TextPaint ds) {
+                //点击事件去掉下划线
+                ds.setUnderlineText(false);
+            }
+        };
+        spannedString.setSpan(clickableSpan1, index1, index1 + key1.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+        //设置点击后的颜色为透明，否则会一直出现高亮
+        tv_privacy_tips.setHighlightColor(Color.TRANSPARENT);
+        //开始响应点击事件
+        tv_privacy_tips.setMovementMethod(LinkMovementMethod.getInstance());
+        tv_privacy_tips.setText(spannedString);
+        //设置弹框宽度占屏幕的80%
+        WindowManager m = getWindowManager();
+        Display defaultDisplay = m.getDefaultDisplay();
+        final WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+        params.width = (int) (defaultDisplay.getWidth() * 0.80);
+        dialog.getWindow().setAttributes(params);
+
+        final boolean[] isExit = {false};
+        btn_exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isExit[0]){
+                    finish();
+                    dialog.dismiss();
+                }else{
+                    Toast.makeText(MMActiviry.this,"退出后将无法使用此应用,确定吗?",Toast.LENGTH_LONG).show();
+                    isExit[0] = true;
+                }
+            }
+        });
+
+        btn_enter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+//                SPUtil.put(MMActiviry.this, SP_VERSION_CODE, currentVersionCode);
+//                SPUtil.put(MMActiviry.this, SP_PRIVACY, true);
+                // 用户首次进入已同意隐私政策，设置变量值
+                SharedPreferences.Editor editor = mSharedPreferences.edit();
+                editor.putBoolean("isAgreePrivacy",true);
+                editor.commit();
+                Toast.makeText(MMActiviry.this, getString(R.string.confirmed), Toast.LENGTH_SHORT).show();
+                isAgreePrivacy = true;
+                onResume();
+            }
+        });
+
+    }
+
+
+
 }
 

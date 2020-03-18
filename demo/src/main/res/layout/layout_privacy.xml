@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2016 The Android Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/them_color_backgroundgreen"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/px_60"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints">
+
+        <LinearLayout
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:background="@drawable/icon_logo"
+                android:layout_width="@dimen/px_100"
+                android:layout_height="@dimen/px_67">
+            </ImageView>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_marginLeft="@dimen/px_30"
+                android:layout_gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/dqt_text"
+                    android:layout_width="@dimen/px_233"
+                    android:layout_height="@dimen/px_47">
+                </ImageView>
+                <ImageView
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/dqt_hzs"
+                    android:layout_marginTop="@dimen/px_6"
+                    android:layout_width="@dimen/px_120"
+                    android:layout_height="@dimen/px_40">
+                </ImageView>
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <TextView
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/px_40"
+        android:id="@+id/tv_company_fullname"
+        android:text="湖南宇畅电力服务有限公司"
+        android:textSize="@dimen/px_22"
+        android:textColor="@color/wheel_timebtn_pre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+    </TextView>
+
+    <TextView
+        android:layout_gravity="center_horizontal"
+        android:textSize="@dimen/px_22"
+        android:id="@+id/tv_version_app"
+        android:text="v"
+        android:textColor="@color/wheel_timebtn_pre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+    </TextView>
+
+    <TextView
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/tv_privary"
+        android:textSize="@dimen/px_30"
+        android:text="隐私政策"
+        android:autoLink="all"
+        android:textColor="@color/entrance_bt_press"
+        android:layout_marginTop="@dimen/px_20"
+        android:layout_width="wrap_content"
+        android:layout_marginBottom="@dimen/px_70"
+        android:layout_height="wrap_content">
+    </TextView>
+
+</LinearLayout>

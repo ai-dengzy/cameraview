@@ -973,11 +973,11 @@
 
     </LinearLayout>-->
 
-
-
-
+        <include layout="@layout/layout_privacy"/>
 
     </LinearLayout>
+
+
 
 
 

@@ -16,14 +16,21 @@
 
 package com.yuchang.camera.ui.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -33,6 +40,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.yuchang.camera.BackgoundcolorSeekBar;
 import com.yuchang.camera.FontsizeRaeSeekBar;
@@ -781,6 +789,21 @@ public class SetUpActivity extends AppCompatActivity {
                     WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
 //        PushAgent.getInstance(this).onAppStart();
+
+
+        TextView tvPrivary = findViewById(R.id.tv_privary);
+        tvPrivary.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG); //下划线
+        tvPrivary.getPaint().setAntiAlias(true);//抗锯齿
+        tvPrivary.setTextColor(Color.rgb(18, 12, 151));
+        tvPrivary.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //打开隐私政策网址
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://ycdlfw.com/userAgreement/")));
+            }
+        });
+        TextView tv_version = findViewById(R.id.tv_version_app);
+        tv_version.setText("v"+getAppVersionName());
     }
 
     @Override
@@ -805,5 +828,22 @@ public class SetUpActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
 //        MobclickAgent.onPause(this);
+    }
+
+
+    /**
+     * 获取当前app version name
+     */
+    public String getAppVersionName() {
+        String appVersionName = "";
+        try {
+            PackageInfo packageInfo = getApplicationContext()
+                    .getPackageManager()
+                    .getPackageInfo(getPackageName(), 0);
+            appVersionName = packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "[getAppVersionName]-error：" + e.getMessage());
+        }
+        return appVersionName;
     }
 }

@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package com.yuchang.camera;
+package com.yuchang.camera.view;
 
-/**
- * 拍照录像事件回调
- */
+import android.app.Dialog;
+import android.content.Context;
 
-public interface CaptureListener {
-    void takePictures();
+import com.yuchang.camera.R;
 
-   /* void recordShort(long time);
+public class PrivacyDialog extends Dialog {
 
-    void recordStart();
+    public PrivacyDialog(Context context) {
+        super(context, R.style.PrivacyThemeDialog);
 
-    void recordEnd(long time);
+        setContentView(R.layout.dialog_privacy);
 
-    void recordZoom(float zoom);
-
-    void recordError();*/
+        setCancelable(false);
+        setCanceledOnTouchOutside(false);
+    }
 }

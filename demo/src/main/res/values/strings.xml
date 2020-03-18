@@ -18,7 +18,7 @@
     <string name="about_dialog_title">About</string>
     <string name="about_dialog_message">CameraKit is open source software distributed under the MIT license.\n\nFor more details visit www.camerakit.website/.</string>
 
-    <string name="app_name">电企通相机</string>
+
     <string name="camera_permission_confirmation">This app demonstrates the usage of CameraView. In order to do that, it needs permission to access camera.</string>
     <string name="camera_permission_not_granted">Camera app cannot do anything without camera permission.</string>
     <string name="picture_taken">Picture taken</string>
@@ -30,7 +30,7 @@
     <string name="flash_on">Flash on</string>
     <string name="title_activity_set_up">SetUpActivity</string>
     <string name="project_name">项目名称</string>
-    <string name="title">电企通相机</string>
+
     <string name="str_main_titile">施工记录</string>
     <string name="jtv_project_name">项目名称：</string>
     <string name="jtv_place">施工单位：</string>
@@ -44,5 +44,22 @@
     <string name="jtv_abtain">取证单位：</string>
     <string name="str_content">备注内容：</string>
     <string name="jtv_logitude_latitude">经纬度数：</string>
+    <string name="title">电企通相机</string>
+    <string name="app_name">电企通相机</string>
+
+    <!--隐私政策-->
+    <string name="privacy_exit">退出</string>
+    <string name="privacy_agree">同意</string>
+    <string name="users_note">用户须知</string>
+    <string name="privacy_tips_key1">点击查看《隐私政策》</string>
+    <string name="privacy_tips">欢迎您使用电企通相机，我们应最新的监管要求，特向您说明如下：
+        \n1.为提供本应用的基本业务功能,在获得您的同意后，我们会开启您设备的摄像头、相册、位置、网络权限以为您提供服务。拒绝授权这些权限将影响您使用工程相机的全部功能。
+        \n2.未经您的同意，我们不会从第三方获取、共享或对外提供您的信息。
+        \n
+        \n点击查看《隐私政策》
+        \n
+    </string>
+    <string name="confirmed">用户须知已确认</string>
+    <string name="opt_privacy">隐私政策</string>
 
 </resources>
